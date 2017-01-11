@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import pika
-# import boto3
+import boto3
 import os
 from urllib.parse import urlencode
 import ssl
@@ -11,6 +11,7 @@ from pprint import pprint
 
 
 def parse_node_list(table):
+
     return set(map(str.strip, table.strip().splitlines()))
 
 
@@ -22,7 +23,7 @@ def parse_mapping(table):
 
         if sensor not in mapping:
             mapping[sensor] = {}
-
+l
         for value in values:
             names = list(map(str.strip, value.split('>')))
             if len(names) == 1:
@@ -137,11 +138,12 @@ allowed_nodes = parse_node_list('''
 ''')
 
 # setup rabbitmq client
-url = 'amqps://node:waggle@beehive1.mcs.anl.gov:23181?{}'.format(urlencode({
+# url = 'amqps://node:waggle@beehive1.mcs.anl.gov:23181?{}'.format(urlencode({
+url = 'amqps://jbracho:password@0.0.0.0:23181?{}'.format(urlencode({
     'ssl': 't',
     'ssl_options': {
-        'certfile': os.path.abspath('/mnt/waggle/SSL/node/cert.pem'),
-        'keyfile': os.path.abspath('/mnt/waggle/SSL/node/key.pem'),
+        'certfile': os.path.abspath('/mnt/waggle/SSL/beehive-server/cert.pem'),
+        'keyfile': os.path.abspath('/mnt/waggle/SSL/beehive-server/key.pem'),
         'ca_certs': os.path.abspath('/mnt/waggle/SSL/waggleca/cacert.pem'),
         'cert_reqs': ssl.CERT_REQUIRED
     }
@@ -177,9 +179,21 @@ def map_values(sensor, values):
 
 
 def callback(ch, method, properties, body):
+    print("[plenario-sender] ch: {}".format(ch))
+    print("[plenario-sender] method: {}".format(method))
+    print("[plenario-sender] properties: {}".format(properties))
+    print("[plenario-sender] body: {}".format(body))
+
     node_id = properties.reply_to
     sensor = properties.type
     timestamp = datetime.fromtimestamp(properties.timestamp / 1000)
+
+    print("[plenario-sender] node_id: {}".format(node_id))
+    print("[plenario-sender] sensor: {}".format(sensor))
+    print("[plenario-sender] timestamp: {}".format(timestamp))
+
+    print ("[plenario-sender] allowed_nodes: {}".format(allowed_nodes))
+    print ("[plenario-sender] mapping: {}".format(mapping))
 
     if node_id in allowed_nodes and sensor in mapping:
         payload = {
