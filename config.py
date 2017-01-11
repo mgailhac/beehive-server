@@ -60,7 +60,7 @@ ini_fp = io.StringIO(ini_str)
 my_config = configparser.RawConfigParser()
 my_config.readfp(ini_fp)
 
-RABBITMQ_HOST=read_value("rabbitmq-host", "rabbitmq")
+RABBITMQ_HOST=read_value("rabbitmq-host", "0.0.0.0")
 logger.info("RABBITMQ_HOST: %s" %(RABBITMQ_HOST))
 
 CASSANDRA_HOST=read_value("cassandra-host", "cassandra")
@@ -75,10 +75,9 @@ RABBITMQ_PORT=23181
 
 
 # Beehive server has needs client certificates for RabbitMQ
-CLIENT_KEY_FILE="/usr/lib/waggle/SSL/beehive-server/key.pem"
-CLIENT_CERT_FILE="/usr/lib/waggle/SSL/beehive-server/cert.pem"
-
-CA_ROOT_FILE="/usr/lib/waggle/SSL/waggleca/cacert.pem"
+CLIENT_KEY_FILE=os.path.abspath("/mnt/waggle/SSL/beehive-server/key.pem")
+CLIENT_CERT_FILE=os.path.abspath("/mnt/waggle/SSL/beehive-server/cert.pem")
+CA_ROOT_FILE=os.path.abspath("/mnt/waggle/SSL/waggleca/cacert.pem")
 
 
 pika_credentials = pika.PlainCredentials('server', 'waggle')

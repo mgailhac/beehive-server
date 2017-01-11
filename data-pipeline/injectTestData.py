@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 
 # 
+import os 
+import sys
+
 import argparse
 import binascii
+
+sys.path.append(os.path.abspath('../'))
 from config import *
+sys.path.pop()
+
 import datetime
 import logging 
 import pika
-import sys
 import time
     
 if __name__ == '__main__':
@@ -58,7 +64,7 @@ if __name__ == '__main__':
                     reply_to    = args.node_id,
                     timestamp   = ts,
                     app_id      = 'testsensor:v1:0',
-                    type        = 'sensor0',
+                    type        = 'PR103J2',
                     headers     = { 
                                     'meta_id'    : '0',
                                     'unit'       : 'unit0',
@@ -67,7 +73,7 @@ if __name__ == '__main__':
         print('properties = ', myProperties)
         dataList = []
         for iParam in range(args.num_params):
-            dataList.append('"test_param{}":"{}"'.format(iParam, nMessages))
+            dataList.append('"temperature":"{}"'.format(iParam, nMessages))
         data = '{' + ','.join(dataList) + '}'
         print('data = ', data)
 
