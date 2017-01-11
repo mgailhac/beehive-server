@@ -14,6 +14,7 @@ from urllib.parse import urlencode
 
 
 # Make sure these environment variables are in your bashrc!
+# Your keys must have NO SPECIAL CHARACTERS like '\' or '$' because amazon.
 #
 # $ vim ~/.bashrc
 #
@@ -195,14 +196,10 @@ def callback(ch, method, properties, body):
             'datetime': timestamp.strftime('%Y-%m-%dT%H:%M:%S'),
         }
 
-        string_payload = json.dumps(payload)
-        bytes_payload = bytes(string_payload, 'utf-8')
-        encoded_payload = base64.b64encode(bytes_payload)
-
         kinesis_client.put_record(**{
             'StreamName': 'ObservationStream',
             'PartitionKey': 'arbitrary',
-            'Data': encoded_payload  # body.decode()
+            'Data': json.dumps(payload)
         })
 
         print("[plenario-sender] Successfully sent: \n")
