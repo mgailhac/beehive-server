@@ -165,7 +165,7 @@ def NodeQuery(node_id_queried = None, bAllNodes = False):
         node_id = node_id.lower()
 
         all_nodes[node_id] = {
-            'project': project,
+            # 'project': project,
             'description': description,
             'reverse_ssh_port': reverse_ssh_port,
             'name': name,
