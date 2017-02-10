@@ -100,10 +100,43 @@ def api_epoch():
         'epoch': int(time.time())
     })
 
+
+v1_ports = [10027, 10028, 10030, 10037, 10038, 10039]
+
+
+def guess_node_groups(node):
+    groups = []
+
+    if node['reverse_ssh_port'] in v1_ports:
+        groups.append('v1')
+    else:
+        groups.append('v2')
+
+    if re.search('aot', node['description'], re.I):
+        groups.append('aot')
+
+    if re.search('chicago', node['description'], re.I) or re.search('chicago', node['location'], re.I):
+        groups.append('chicago')
+
+    if re.search('niu', node['description'], re.I) or re.search('niu', node['location'], re.I):
+        groups.append('niu')
+
+    if re.search('david lary', node['description'], re.I) or re.search('dallas', node['location'], re.I):
+        groups.append('dallas')
+
+    if re.search('telefonix', node['location'], re.I):
+        groups.append('tfx')
+
+    if re.search('panasonic', node['description'], re.I) or re.search('panasonic', node['location'], re.I):
+        groups.append('panasonic')
+
+    return groups
+
+
 def NodeQuery(node_id_queried = None, bAllNodes = False):
     # if node_id_queried, then filter only that node, otherwise, query all nodes
     # if bAllNodes ('b' is for 'bool') is True, print all nodes, otherwise filter the active ones
-    
+
     db = get_mysql_db()
 
     all_nodes = {}
@@ -115,7 +148,7 @@ def NodeQuery(node_id_queried = None, bAllNodes = False):
         whereClause = " WHERE opmode = 'active'"
     else:
         whereClause = ""
-        
+
     query = "SELECT node_id, hostname, project, description, reverse_ssh_port, name, location, last_updated FROM nodes {};".format(whereClause)
 
     logger.debug(' query = ' + query)
@@ -139,6 +172,8 @@ def NodeQuery(node_id_queried = None, bAllNodes = False):
             'location': location,
             'last_updated': last_updated
         }
+
+        all_nodes[node_id]['groups'] = guess_node_groups(all_nodes[node_id])
 
     if bAllNodes and not node_id_queried:
         nodes_dict = export.list_node_dates()
@@ -166,7 +201,7 @@ def api_nodes():
 
     return NodeQuery(bAllNodes = bAllNodes)
 
-    
+
 @api.route('/1/nodes/<node_id>')
 def api_nodes_single(node_id):
     node_id = node_id.lower()
@@ -251,14 +286,14 @@ def api_all_dates():
     bSortReverse = False if sort_type == 'asc' else True
     for node_id in sorted(nodes_dict):
         nodes_dict[node_id].sort(reverse = bSortReverse)
-    
+
     obj = {}
     obj['data'] = nodes_dict
 
     return jsonify(obj)
-    
-    
-    
+
+
+
 @api.route('/1/nodes_last_update/')
 def api_nodes_last_update():
     return jsonify(export.get_nodes_last_update_dict())
@@ -269,7 +304,7 @@ def api_export(node_id):
     version = request.args.get('version', '1')
     sort_type = request.args.get('sort', 'desc').lower()[:3]
     limit = request.args.get('limit', None)
-    
+
     logger.info("__ api_export()  date = {}, version = {}  sort_type = {} ".format(str(date), str(version), sort_type))
 
     if not date:
