@@ -166,11 +166,11 @@ def NodeQuery(node_id_queried = None, bAllNodes = False):
 
         all_nodes[node_id] = {
             # 'project': project,
-            'description': description,
+            'description': description or '',
             'reverse_ssh_port': reverse_ssh_port,
-            'name': name,
-            'location': location,
-            'last_updated': last_updated
+            'name': name or '',
+            'location': location or '',
+            'last_updated': last_updated,
         }
 
         all_nodes[node_id]['groups'] = guess_node_groups(all_nodes[node_id])
