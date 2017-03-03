@@ -21,8 +21,8 @@ import logging
 from multiprocessing import Process, Manager
 import pika
 import time
-from waggle_protocol.protocol.PacketHandler import *
-from waggle_protocol.utilities.gPickler import *
+#from waggle_protocol.protocol.PacketHandler import *
+#from waggle_protocol.utilities.gPickler import *
 #logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 
@@ -47,28 +47,30 @@ class DataProcess(Process):
             self.queue          = 'db-raw'
             self.statement = "INSERT INTO    sensor_data_raw   (node_id, date, plugin_name, plugin_version, plugin_instance, timestamp, parameter, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             self.function_ExtractValuesFromMessage = self.ExtractValuesFromMessage_raw
-        else:  
+            credentials = pika.PlainCredentials('queue-to-db-raw', 'waggle')
+       else:  
             self.input_exchange = 'plugins-out'
             self.queue          = 'db-decoded'
             self.statement = "INSERT INTO    sensor_data_decoded   (node_id, date, ingest_id, meta_id, timestamp, data_set, sensor, parameter, data, unit) VALUES (?, ?, ?, ?, ?,   ?, ?, ?, ?, ?)"
             self.function_ExtractValuesFromMessage = self.ExtractValuesFromMessage_decoded
+            credentials = pika.PlainCredentials('queue-to-db-decoded', 'waggle')
             
         logger.info("Initializing DataProcess")
         
-        # Set up the Rabbit connection
-        #self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-        #Connect to rabbitMQ
+        # Connect to rabbitMQ
         while True:
             try:
-                self.connection = pika.BlockingConnection(pika_params)
+                parameters = pika.ConnectionParameters('beehive-rabbitmq', credentials=credentials)
+                self.connection = pika.BlockingConnection(parameters)
+                
             except Exception as e:
-                logger.error("QueueToDb: Could not connect to RabbitMQ server \"%s\": %s" % (pika_params.host, e))
+                logger.error("QueueToDb: Could not connect to RabbitMQ server: %s" % (e))
                 time.sleep(1)
                 continue
             break
             
     
-        logger.info("Connected to RabbitMQ server \"%s\"" % (pika_params.host))
+        logger.info("Connected to RabbitMQ server")
         self.verbosity = verbosity
         self.numInserted = 0
         self.session = None
