@@ -11,7 +11,7 @@ RestartSec=1m
 Environment='CONTAINER=beehive-plenario-sender'
 Environment='IMAGE=waggle/beehive-plenario-sender'
 
-ExecStart=/bin/docker run \
+ExecStart=/usr/bin/docker run \
   --log-driver=journald \
   --rm \
   --name=${CONTAINER} \
