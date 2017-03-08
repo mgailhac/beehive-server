@@ -48,7 +48,7 @@ class DataProcess(Process):
             self.statement = "INSERT INTO    sensor_data_raw   (node_id, date, plugin_name, plugin_version, plugin_instance, timestamp, parameter, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             self.function_ExtractValuesFromMessage = self.ExtractValuesFromMessage_raw
             credentials = pika.PlainCredentials('queue-to-db-raw', 'waggle')
-       else:  
+        else:  
             self.input_exchange = 'plugins-out'
             self.queue          = 'db-decoded'
             self.statement = "INSERT INTO    sensor_data_decoded   (node_id, date, ingest_id, meta_id, timestamp, data_set, sensor, parameter, data, unit) VALUES (?, ?, ?, ?, ?,   ?, ?, ?, ?, ?)"
