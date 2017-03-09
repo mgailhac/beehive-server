@@ -3,26 +3,26 @@ image = waggle/beehive-cert
 container = beehive-cert
 
 build:
-    docker build -t $(image) .
+	docker build -t $(image) .
 
 start:
-    systemctl start $(container)
+	systemctl start $(container)
 
 stop:
-    systemctl stop $(container)
+	systemctl stop $(container)
 
 restart:
-    systemctl restart $(container)
+	systemctl restart $(container)
 
 logs:
-    journalctl -f -u $(container)
+	journalctl -f -u $(container)
 
 clean:
-    docker rm -f $(container)
-    docker rmi -f $(image)
+	docker rm -f $(container)
+	docker rmi -f $(image)
 
 run:
-    docker run \
+	docker run \
         --log-driver=journald \
         --ti \
         -rm \
