@@ -65,6 +65,7 @@ if true; then
     
     # beehive-config.json
     mkdir -p /mnt/beehive
+    cp -i beehive-config.json /mnt/beehive
     echo; echo; echo "*** YOU MUST edit /mnt/beehive/beehive-config.json specific to this beehive server"
     echo " If you have not customized this file yet, go do it now."
     echo " If you have customized this file, and want to continue, enter 'Yes'."
@@ -74,7 +75,6 @@ if true; then
         exit
     fi
     
-    cp -i beehive-config.json /mnt/beehive
     
     # NGINX needs SSL keys
     echo; echo; echo "NGINX SSL keys need the following information..."
