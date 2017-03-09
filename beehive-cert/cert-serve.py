@@ -11,7 +11,8 @@ import time
 from os import listdir
 from os.path import isdir, join
 sys.path.append("..")
-from waggle_protocol.utilities.mysql import *
+#from waggle_protocol.utilities.mysql import *
+from waggle.protocol.utils.mysql import *
 
 
 LOG_FORMAT='%(asctime)s - %(name)s - %(levelname)s - line=%(lineno)d - %(message)s'
