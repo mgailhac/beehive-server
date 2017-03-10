@@ -41,22 +41,10 @@ def decode_alphasense(data):
 
 plugin = 'alphasense:1'
 
-#url = 'amqp://worker_alphasense:worker@localhost'
-url = 'amqp://worker_alphasense:worker@beehive-rabbitmq'
-
-# url = 'amqps://worker_alphasense:worker@beehive1.mcs.anl.gov:23181?{}'.format(urlencode({
-#     'ssl': 't',
-#     'ssl_options': {
-#         'certfile': os.path.abspath('SSL/node/cert.pem'),
-#         'keyfile': os.path.abspath('SSL/node/key.pem'),
-#         'ca_certs': os.path.abspath('SSL/waggleca/cacert.pem'),
-#         'cert_reqs': ssl.CERT_REQUIRED
-#     }
-# }))
-
 credentials = pika.PlainCredentials('worker_alphasense', 'waggle')
 parameters = pika.ConnectionParameters('beehive-rabbitmq', credentials=credentials)
 connection = pika.BlockingConnection(parameters)
+print('connected to RabbitMQ')
 
 channel = connection.channel()
 

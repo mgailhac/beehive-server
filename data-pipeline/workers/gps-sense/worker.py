@@ -9,19 +9,10 @@ import re
 
 plugin = 'gps:1'
 
-url = 'amqp://worker_gps:worker@beehive-rabbitmq'
-
-# url = 'amqps://node:waggle@beehive1.mcs.anl.gov:23181?{}'.format(urlencode({
-#     'ssl': 't',
-#     'ssl_options': {
-#         'certfile': os.path.abspath('SSL/node/cert.pem'),
-#         'keyfile': os.path.abspath('SSL/node/key.pem'),
-#         'ca_certs': os.path.abspath('SSL/waggleca/cacert.pem'),
-#         'cert_reqs': ssl.CERT_REQUIRED
-#     }
-# }))
-
-connection = pika.BlockingConnection(pika.URLParameters(url))
+credentials = pika.PlainCredentials('worker_gps', 'waggle')
+parameters = pika.ConnectionParameters('beehive-rabbitmq', credentials=credentials)
+connection = pika.BlockingConnection(parameters)
+print('connected to RabbitMQ')
 
 channel = connection.channel()
 
