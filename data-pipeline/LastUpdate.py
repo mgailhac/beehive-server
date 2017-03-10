@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 
 # LastUpdate.py
-import os
-import sys
-sys.path.append(os.path.abspath('../'))
-sys.path.append("/usr/lib/waggle/")
-sys.path.append("/usr/lib/waggle/beehive-server")
-
 import argparse
 from cassandra.cluster import Cluster
 from cassandra.query import BatchStatement
@@ -17,10 +11,10 @@ from config import *
 import datetime
 import logging 
 from multiprocessing import Process, Manager, Queue
+import os
 import pika
+import sys
 import time
-#from waggle_protocol.protocol.PacketHandler import *
-#from waggle_protocol.utilities.gPickler import *
 #logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 logger = logging.getLogger(__name__)
@@ -42,10 +36,12 @@ class LastUpdateProcess(Process):
             self.input_exchange = 'logs'
             self.queue          = 'last-log'
             self.statement = "INSERT INTO nodes_last_log  (node_id, last_update) VALUES (?, ?)"
-        else:
+            credentials = pika.PlainCredentials('last_logs', 'waggle')
+        else: # 'data'
             self.input_exchange = 'data-pipeline-in'
             self.queue          = 'last-data'
             self.statement = "INSERT INTO nodes_last_data (node_id, last_update) VALUES (?, ?)"
+            credentials = pika.PlainCredentials('last_data', 'waggle')
         
         logger.info("Initializing LastUpdateProcess")
         
@@ -54,7 +50,9 @@ class LastUpdateProcess(Process):
         #Connect to rabbitMQ
         while True:
             try:
-                self.connection = pika.BlockingConnection(pika_params)
+                # self.connection = pika.BlockingConnection(pika_params)
+                parameters = pika.ConnectionParameters('beehive-rabbitmq', credentials=credentials)
+                self.connection = pika.BlockingConnection(parameters)
             except Exception as e:
                 logger.error("%s: Could not connect to RabbitMQ server \"%s\": %s" % (sys.argv[0], pika_params.host, e))
                 time.sleep(1)
