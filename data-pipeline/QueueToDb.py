@@ -21,8 +21,6 @@ import logging
 from multiprocessing import Process, Manager
 import pika
 import time
-#from waggle_protocol.protocol.PacketHandler import *
-#from waggle_protocol.utilities.gPickler import *
 #logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 
