@@ -24,8 +24,8 @@ clean:
 run:
 	docker run \
         --log-driver=journald \
-        --ti \
-        -rm \
+        -ti \
+        --rm \
         -p 24181:80 \
         -v $(data)/ssh_keys/:/usr/lib/waggle/ssh_keys/ \
         -v $(data)/waggle/SSL/:/usr/lib/waggle/SSL/ \
