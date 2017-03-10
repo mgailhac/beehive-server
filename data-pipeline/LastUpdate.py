@@ -7,7 +7,6 @@ from cassandra.query import BatchStatement
 from cassandra import ConsistencyLevel
 from cassandra.cqlengine.columns import Ascii
 from cassandra.cqlengine.usertype import UserType
-from config import *
 import datetime
 import logging 
 from multiprocessing import Process, Manager, Queue
