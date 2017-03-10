@@ -19,8 +19,8 @@ import logging
 from multiprocessing import Process, Manager, Queue
 import pika
 import time
-from waggle_protocol.protocol.PacketHandler import *
-from waggle_protocol.utilities.gPickler import *
+#from waggle_protocol.protocol.PacketHandler import *
+#from waggle_protocol.utilities.gPickler import *
 #logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ logger.setLevel(logging.DEBUG)
 
 class LastUpdateProcess(Process):
     """
-        This process writes the most recent date of each node's incoming raw sample
+        This process writes the most recent date of each node's incoming raw sample (data or logs)
     """
 
     def __init__(self, q, mode, verbosity = 0):
@@ -56,7 +56,7 @@ class LastUpdateProcess(Process):
             try:
                 self.connection = pika.BlockingConnection(pika_params)
             except Exception as e:
-                logger.error("QueueToDb: Could not connect to RabbitMQ server \"%s\": %s" % (pika_params.host, e))
+                logger.error("%s: Could not connect to RabbitMQ server \"%s\": %s" % (sys.argv[0], pika_params.host, e))
                 time.sleep(1)
                 continue
             break
