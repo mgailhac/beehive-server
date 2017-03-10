@@ -53,12 +53,12 @@ class LastUpdateProcess(Process):
                 parameters = pika.ConnectionParameters('beehive-rabbitmq', credentials=credentials)
                 self.connection = pika.BlockingConnection(parameters)
             except Exception as e:
-                logger.error("%s: Could not connect to RabbitMQ server \"%s\": %s" % (sys.argv[0], pika_params.host, e))
+                logger.error("%s: Could not connect to RabbitMQ server : %s" % (sys.argv[0],  e))
                 time.sleep(1)
                 continue
             break
             
-        logger.info("Connected to RabbitMQ server \"%s\"" % (pika_params.host))
+        logger.info("Connected to RabbitMQ server")
         self.verbosity = verbosity
         self.numInserted = 0
         self.session = None
