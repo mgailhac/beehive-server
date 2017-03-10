@@ -54,7 +54,9 @@ url = 'amqp://worker_alphasense:worker@beehive-rabbitmq'
 #     }
 # }))
 
-connection = pika.BlockingConnection(pika.URLParameters(url))
+credentials = pika.PlainCredentials('worker_alphasense', 'waggle')
+parameters = pika.ConnectionParameters('beehive-rabbitmq', credentials=credentials)
+connection = pika.BlockingConnection(parameters)
 
 channel = connection.channel()
 
