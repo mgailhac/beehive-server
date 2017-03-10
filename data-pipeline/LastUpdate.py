@@ -25,7 +25,7 @@ logger.setLevel(logging.DEBUG)
 
 class LastUpdateProcess(Process):
     """
-        This process writes the most recent date of each node's incoming raw sample (data or logs)
+        This process writes the most recent date of each node's incoming raw sample (data or log)
     """
 
     def __init__(self, q, mode, verbosity = 0):
@@ -35,11 +35,11 @@ class LastUpdateProcess(Process):
         super(LastUpdateProcess, self).__init__()
         
         self.q = q
-        if mode == 'logs':
+        if mode == 'log':
             self.input_exchange = 'logs'
             self.queue          = 'last-log'
             self.statement = "INSERT INTO nodes_last_log  (node_id, last_update) VALUES (?, ?)"
-            credentials = pika.PlainCredentials('last_logs', 'waggle')
+            credentials = pika.PlainCredentials('last_log', 'waggle')
         else: # 'data'
             self.input_exchange = 'data-pipeline-in'
             self.queue          = 'last-data'
@@ -195,7 +195,7 @@ class LastUpdateProcess(Process):
    
 if __name__ == '__main__':
     argParser = argparse.ArgumentParser()
-    argParser.add_argument('dataToTrack', choices = ['data', 'logs'], help = 'which stream of data to track')
+    argParser.add_argument('dataToTrack', choices = ['data', 'log'], help = 'which stream of data to track')
     argParser.add_argument('--verbose', '-v', action='count')
     args = argParser.parse_args()
     verbosity = 0 if not args.verbose else args.verbose
