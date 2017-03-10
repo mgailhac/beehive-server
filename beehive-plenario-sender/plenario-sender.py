@@ -185,14 +185,11 @@ allowed_nodes = parse_node_list('''
 ''')
 print('allowed_nodes = ', allowed_nodes)
 
-# url = 'amqps://jbracho:password@0.0.0.0:23181?{}'.format(urlencode({
-# url = 'amqps://node:waggle@beehive1.mcs.anl.gov:23181?{}'.format(urlencode({
-# url = 'amqps://node:waggle@172.18.0.2:23181?{}'.format(urlencode({
 url = 'amqps://node:waggle@beehive-rabbitmq:23181?{}'.format(urlencode({
     'ssl': 't',
     'ssl_options': {
-        'certfile': os.path.abspath('/mnt/waggle/SSL/beehive-server/cert.pem'),
-        'keyfile': os.path.abspath('/mnt/waggle/SSL/beehive-server/key.pem'),
+        'certfile': os.path.abspath('/mnt/waggle/SSL/server/cert.pem'),
+        'keyfile': os.path.abspath('/mnt/waggle/SSL/server/key.pem'),
         'ca_certs': os.path.abspath('/mnt/waggle/SSL/waggleca/cacert.pem'),
         'cert_reqs': ssl.CERT_REQUIRED
     }
@@ -249,8 +246,9 @@ if __name__ == "__main__":
     pprint(allowed_nodes)
     print()
 
-    connection = pika.BlockingConnection(pika.URLParameters(url))
-
+    credentials = pika.PlainCredentials('plenario-sender', 'waggle')
+    parameters = pika.ConnectionParameters('beehive-rabbitmq', credentials=credentials)
+    connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     channel.exchange_declare(exchange='plugins-out', exchange_type='fanout', durable=True)
     channel.queue_declare(queue='plenario', durable=True)
