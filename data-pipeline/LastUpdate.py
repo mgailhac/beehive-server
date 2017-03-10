@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 
 # LastUpdate.py
+import os
+import sys
+sys.path.append(os.path.abspath('.'))
 import argparse
 from cassandra.cluster import Cluster
 from cassandra.query import BatchStatement
 from cassandra import ConsistencyLevel
 from cassandra.cqlengine.columns import Ascii
 from cassandra.cqlengine.usertype import UserType
+from config import *
 import datetime
 import logging 
 from multiprocessing import Process, Manager, Queue
-import os
 import pika
-import sys
 import time
 #logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
+
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
