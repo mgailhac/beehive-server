@@ -113,20 +113,22 @@ if true; then
 
     #apt-get install -y python-webpy
 
-    # pull all the images we have in the docker hub
-    docker pull cassandra:3.2
-    docker pull mysql:5.7.10
-    docker pull rabbitmq:3.5.6
-    docker pull waggle/beehive-cert:latest
-    docker pull waggle/beehive-sshd:latest
-    docker pull waggle/beehive-server:latest
+    # pull all the images we have in the docker hub 
+    #  - commented out because "docker build" should automatically pull any "FROM" containers
+    
+    # docker pull cassandra:3.2
+    # docker pull mysql:5.7.10
+    # docker pull rabbitmq:3.5.6
+    # docker pull waggle/beehive-server:latest
     
     # build all the images that need to be built
     for a in \
+        /root/git/beehive-server/beehive-cert/                      \
         /root/git/beehive-server/beehive-flask/                     \
         /root/git/beehive-server/beehive-nginx/                     \
         /root/git/beehive-server/beehive-plenario-sender/           \
         /root/git/beehive-server/beehive-queue-to-mysql/            \
+        /root/git/beehive-server/beehive-sshd/                      \
         /root/git/beehive-server/beehive-rabbitmq/                  \
         /root/git/beehive-server/data-pipeline/workers/gps-sense/   \
         /root/git/beehive-server/data-pipeline/workers/alphasense/  \
@@ -202,11 +204,13 @@ if true; then
     sleep 20
     while true
     do docker exec -ti  beehive-rabbitmq bash -c '\
+            rabbitmq-plugins enable rabbitmq_management rabbitmq_auth_mechanism_ssl \
+            rabbitmqctl add_user waggle waggle  ; \
+            rabbitmqctl set_user_tags waggle administrator  ; \
             rabbitmqctl add_user node waggle  ; \
             rabbitmqctl add_user server waggle  ; \
             rabbitmqctl set_permissions node "node_.*" ".*" ".*"  ; \
             rabbitmqctl set_permissions server ".*" ".*" ".*"  ; \
-            rabbitmq-plugins enable rabbitmq_auth_mechanism_ssl' \
             && break
       sleep 10
       nTries=$[$nTries+1]
