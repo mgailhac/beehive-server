@@ -201,16 +201,19 @@ if true; then
     sleep 20
     while true
     do docker exec -ti  beehive-rabbitmq bash -c '\
-            rabbitmq-plugins enable rabbitmq_management rabbitmq_auth_mechanism_ssl \
-            curl localhost:15672/cli/rabbitmqadmin > /usr/bin/rabbitmqadmin; \
-            chmod 777 /usr/bin/rabbitmqadmin; \
-            rabbitmqctl add_user waggle waggle  ; \
-            rabbitmqctl set_user_tags waggle administrator  ; \
-            rabbitmqctl add_user node waggle  ; \
-            rabbitmqctl add_user server waggle  ; \
-            rabbitmqctl set_permissions node "node_.*" ".*" ".*"  ; \
-            rabbitmqctl set_permissions server ".*" ".*" ".*"  ;' \
+            /usr/lib/waggle/beehive-server/beehive-rabbitmq/rabbitmqInit.bash' \
             && break
+            
+            # rabbitmq-plugins enable rabbitmq_management rabbitmq_auth_mechanism_ssl ; \
+            # curl localhost:15672/cli/rabbitmqadmin > /usr/bin/rabbitmqadmin ; \
+            # chmod 777 /usr/bin/rabbitmqadmin ; \
+            # rabbitmqctl add_user waggle waggle  ; \
+            # rabbitmqctl set_user_tags waggle administrator  ; \
+            # rabbitmqctl add_user node waggle  ; \
+            # rabbitmqctl add_user server waggle  ; \
+            # rabbitmqctl set_permissions node "node_.*" ".*" ".*"  ; \
+            # rabbitmqctl set_permissions server ".*" ".*" ".*"  ;' \
+            
       sleep 10
       nTries=$[$nTries+1]
       echo "rabbitmqctl try #" $nTries " ..."
