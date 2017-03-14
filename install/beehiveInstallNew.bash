@@ -61,8 +61,18 @@ if true; then
     #########   INSTALL
     #####################################################################
     
-    #### First, do all the pieces that require user-input 
+    apt-get install -y curl
+    apt-get install -y git
+    apt update
     
+    cd /root
+    rm -rf git
+    mkdir -p git
+    cd git
+    git clone https://github.com/waggle-sensor/beehive-server.git
+    cd /root/git/beehive-server/
+    git checkout wcc-install0
+
     # beehive-config.json
     mkdir -p /mnt/beehive
     cp -i beehive-config.json /mnt/beehive
@@ -75,26 +85,12 @@ if true; then
         exit
     fi
     
-    
     # NGINX needs SSL keys
     echo; echo; echo "NGINX SSL keys need the following information..."
     cd /root/git/beehive-server/beehive-nginx
     make ssl
     echo "NGINX SSL keys created"
     echo; echo
-
-    # The rest is autonomous - does not require user input - and takes a while
-    apt-get install -y curl
-    apt-get install -y git
-    apt update
-    
-    cd /root
-    rm -rf git
-    mkdir -p git
-    cd git
-    git clone https://github.com/waggle-sensor/beehive-server.git
-    cd /root/git/beehive-server/
-    git checkout wcc-install0
     
     #### Docker
     apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
