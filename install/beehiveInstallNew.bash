@@ -202,6 +202,8 @@ if true; then
     while true
     do docker exec -ti  beehive-rabbitmq bash -c '\
             rabbitmq-plugins enable rabbitmq_management rabbitmq_auth_mechanism_ssl \
+            curl localhost:15672/cli/rabbitmqadmin > /usr/bin/rabbitmqadmin; \
+            chmod 777 /usr/bin/rabbitmqadmin; \
             rabbitmqctl add_user waggle waggle  ; \
             rabbitmqctl set_user_tags waggle administrator  ; \
             rabbitmqctl add_user node waggle  ; \
