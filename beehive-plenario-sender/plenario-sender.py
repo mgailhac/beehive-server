@@ -19,7 +19,7 @@ import ssl
 
 from datetime import datetime
 from pprint import pprint
-from urllib.parse import urlencode
+#from urllib.parse import urlencode
 
 global nCallbacks
 nCallbacks = 0
@@ -185,7 +185,7 @@ allowed_nodes = parse_node_list('''
 ''')
 print('allowed_nodes = ', allowed_nodes)
 
-url = 'amqps://node:waggle@beehive-rabbitmq:23181?{}'.format(urlencode({
+"""url = 'amqps://node:waggle@beehive-rabbitmq:23181?{}'.format(urlencode({
     'ssl': 't',
     'ssl_options': {
         'certfile': os.path.abspath('/mnt/waggle/SSL/server/cert.pem'),
@@ -195,6 +195,7 @@ url = 'amqps://node:waggle@beehive-rabbitmq:23181?{}'.format(urlencode({
     }
 }))
 print('url = ', url)
+"""
 
 def map_values(sensor, values):
     for key, value in values.items():
