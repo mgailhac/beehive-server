@@ -7,7 +7,7 @@ for UNAME in            \
     server              \
     worker_alphasense   \
     worker_coresense    \
-    worker_gps          \
+    worker_gps
 do echo $UNAME
     # declare user name=... password=... tags=...
     rabbitmqadmin declare user name=$UNAME password=waggle

@@ -201,7 +201,7 @@ if true; then
     sleep 20
     while true
     do docker exec -ti  beehive-rabbitmq bash -c '\
-            /usr/lib/waggle/beehive-server/beehive-rabbitmq/rabbitmqInit.bash' \
+            bash /usr/lib/waggle/beehive-server/beehive-rabbitmq/rabbitmqInit.bash' \
             && break
             
             # rabbitmq-plugins enable rabbitmq_management rabbitmq_auth_mechanism_ssl ; \
