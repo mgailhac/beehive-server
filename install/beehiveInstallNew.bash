@@ -78,7 +78,7 @@ if true; then
     
     # NGINX needs SSL keys
     echo; echo; echo "NGINX SSL keys need the following information..."
-    cd ~/git/beehive-server/beehive-nginx
+    cd /root/git/beehive-server/beehive-nginx
     make ssl
     echo "NGINX SSL keys created"
     echo; echo
@@ -88,12 +88,12 @@ if true; then
     apt-get install -y git
     apt update
     
-    cd ~
+    cd /root
     rm -rf git
     mkdir -p git
     cd git
     git clone https://github.com/waggle-sensor/beehive-server.git
-    cd ~/git/beehive-server/
+    cd /root/git/beehive-server/
     git checkout wcc-install0
     
     #### Docker
@@ -106,7 +106,7 @@ if true; then
     docker --version
     
     export DATA="/mnt"
-    echo "export DATA=/mnt/" >> ~/.bash_profile
+    echo "export DATA=/mnt/" >> /root/.bash_profile
     docker network create beehive
 
     docker network ls
@@ -161,7 +161,7 @@ if true; then
     chmod +x ${DATA}/waggle/SSL/server
 
     ### systemd  - start all the services once the containers are available
-    cd ~/git/beehive-server/systemd/
+    cd /root/git/beehive-server/systemd/
       
     for service in *.service ; do
         echo "Deploy ${service}"
@@ -211,8 +211,8 @@ if true; then
             rabbitmqctl add_user node waggle  ; \
             rabbitmqctl add_user server waggle  ; \
             rabbitmqctl set_permissions node "node_.*" ".*" ".*"  ; \
-            rabbitmqctl set_permissions server ".*" ".*" ".*"  ; \
-            && break'
+            rabbitmqctl set_permissions server ".*" ".*" ".*"  ;' \
+            && break
       sleep 10
       nTries=$[$nTries+1]
       echo "rabbitmqctl try #" $nTries " ..."
