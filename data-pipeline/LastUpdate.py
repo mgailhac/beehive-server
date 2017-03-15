@@ -74,12 +74,10 @@ class LastUpdateProcess(Process):
         
         self.channel = self.connection.channel()
         self.channel.basic_qos(prefetch_count=1)
-        # Declare this process's queue
-        self.channel.queue_declare(self.queue)
         
-        self.channel.queue_bind(exchange = self.input_exchange,
-            queue = self.queue)
-        
+        # Declare this process's queue - redundant with initialization script
+        #self.channel.queue_declare(self.queue, durable=True)
+        #self.channel.queue_bind(exchange = self.input_exchange, queue = self.queue)
         
         try: 
             self.channel.basic_consume(self.callback, queue=self.queue)
