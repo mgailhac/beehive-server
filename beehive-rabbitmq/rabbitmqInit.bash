@@ -10,10 +10,10 @@ for UNAME in            \
     worker_gps
 do echo $UNAME
     # declare user name=... password=... tags=...
-    rabbitmqadmin declare user name=$UNAME password=waggle
+    rabbitmqadmin declare user name=$UNAME password=waggle tags=""
     
     # declare permission vhost=... user=... configure=... write=... read=...
-    rabbitmqadmin declare permission user=$UNAME configure=" " write=".*" read=".*"
+    rabbitmqadmin declare permission user=$UNAME vhost="/" configure=".*" write=".*" read=".*"
     
     rabbitmqctl list_user_permissions $UNAME
 done
