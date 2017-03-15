@@ -60,15 +60,15 @@ if __name__ == '__main__':
                     if False:
                         # for some reason, this generates times that are UTC+6 (our timezone is UTC-6, so maybe the offset is added twice???)
                         timestamp = int(datetime.datetime.utcnow().timestamp() * 1000)
-                        cmd = '''/bin/docker exec -t beehive-cassandra cqlsh -e "INSERT INTO waggle.nodes_last_ssh (node_id, last_update) VALUES ('{}', {})" '''.format(node_id, timestamp)
+                        cmd = '''/usr/bin/docker exec -t beehive-cassandra cqlsh -e "INSERT INTO waggle.nodes_last_ssh (node_id, last_update) VALUES ('{}', {})" '''.format(node_id, timestamp)
                     else:
-                        cmd = '''/bin/docker exec -t beehive-cassandra cqlsh -e "INSERT INTO waggle.nodes_last_ssh (node_id, last_update) VALUES ('{}', toUnixTimestamp(now()))" '''.format(node_id)
+                        cmd = '''/usr/bin/docker exec -t beehive-cassandra cqlsh -e "INSERT INTO waggle.nodes_last_ssh (node_id, last_update) VALUES ('{}', toUnixTimestamp(now()))" '''.format(node_id)
 
                     Cmd(cmd)
                 except:
                     pass
         if verbosity > 1:    
-            results = Cmd('''/bin/docker exec -it beehive-cassandra cqlsh -e "SELECT * FROM waggle.nodes_last_ssh" ''')
+            results = Cmd('''/usr/bin/docker exec -it beehive-cassandra cqlsh -e "SELECT * FROM waggle.nodes_last_ssh" ''')
             for x in results:
                 print(x)
         tEnd = datetime.datetime.utcnow()
