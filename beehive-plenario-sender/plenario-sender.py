@@ -247,7 +247,7 @@ if __name__ == "__main__":
     pprint(allowed_nodes)
     print()
 
-    credentials = pika.PlainCredentials('plenario-sender', 'waggle')
+    credentials = pika.PlainCredentials('plenario_sender', 'waggle')
     parameters = pika.ConnectionParameters('beehive-rabbitmq', credentials=credentials)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()

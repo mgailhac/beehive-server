@@ -7,6 +7,7 @@ for UNAME in            \
     last_data           \
     last_log            \
     node                \
+    plenario_sender     \
     queue_to_db_decoded \
     queue_to_db_raw     \
     server              \
