@@ -16,23 +16,12 @@ print('connected to RabbitMQ')
 
 channel = connection.channel()
 
-channel.exchange_declare(exchange='plugins-in',
-                         exchange_type='direct')
-
-channel.exchange_bind(source='data-pipeline-in',
-                      destination='plugins-in')
-
 channel.queue_declare(queue=plugin,
                       durable=True)
 
 channel.queue_bind(queue=plugin,
                    exchange='plugins-in',
                    routing_key=plugin)
-
-channel.exchange_declare(exchange='plugins-out',
-                         exchange_type='fanout',
-                         durable=True)
-
 
 pattern = re.compile("(.+)\*(.+)\'(.+)")
 
