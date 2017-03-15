@@ -92,6 +92,9 @@ if true; then
     echo "NGINX SSL keys created"
     echo; echo
     
+    # ssl keys should be copied or generated into '/usr/lib/waggle/ssh_keys/id_rsa_waggle_aot_registration.pub'
+    
+    
     #### Docker
     apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
     export CODENAME=$(lsb_release --codename | grep -o "[a-z]*$" | tr -d '\n')
@@ -159,7 +162,7 @@ if true; then
     ### systemd  - start all the services once the containers are available
     cd /root/git/beehive-server/systemd/
       
-    for service in *.service ; do
+    for service in beehive-*.service ; do
         echo "Deploy ${service}"
         rm -f /etc/systemd/system/${service}
         cp ${service} /etc/systemd/system
