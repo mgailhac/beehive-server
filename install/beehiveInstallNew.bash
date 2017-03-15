@@ -2,6 +2,8 @@
 # Must be run after superuser -i command:
 ### sudo -i
 set -v -x 
+echo "STARTING INSTALL..."
+date
 
 if true; then
     if true; then
@@ -222,5 +224,8 @@ if true; then
       echo "rabbitmqctl try #" $nTries " ..."
     done
 fi 
+
+echo "FINISHING INSTALL..."
+date
 echo 'DONE'
 date
