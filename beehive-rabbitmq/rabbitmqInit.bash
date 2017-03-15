@@ -1,3 +1,8 @@
+cd /usr/lib/waggle/beehive-server/beehive-rabbitmq
+rabbitmq-plugins enable rabbitmq_management rabbitmq_auth_mechanism_ssl
+curl localhost:15672/cli/rabbitmqadmin > /usr/bin/rabbitmqadmin
+chmod 777 /usr/bin/rabbitmqadmin
+
 for UNAME in            \
     last_data           \
     last_log            \
