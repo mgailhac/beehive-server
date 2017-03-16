@@ -172,6 +172,7 @@ if true; then
         systemctl enable ${service}
         systemctl start ${service}
         #systemctl status ${service}  --no-page -l
+        sleep 3
     done
     
     sleep 10
