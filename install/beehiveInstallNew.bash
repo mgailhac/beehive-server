@@ -171,7 +171,7 @@ if true; then
         systemctl daemon-reload
         systemctl enable ${service}
         systemctl start ${service}
-        #systemctl status ${service}  --no-page -l
+        systemctl status ${service}  --no-page -l
         sleep 3
     done
     
