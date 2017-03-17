@@ -182,6 +182,7 @@ orientation.z > orient_z
 allowed_nodes = parse_node_list('''
 0000001e0610ba72
 0000001e0610b9e7
+0000001e0610b9fd
 ''')
 print('allowed_nodes = ', allowed_nodes)
 
