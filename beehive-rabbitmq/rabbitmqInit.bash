@@ -6,6 +6,7 @@ chmod 777 /usr/bin/rabbitmqadmin
 for UNAME in            \
     last_data           \
     last_log            \
+    log_saver           \
     node                \
     plenario_sender     \
     queue_to_db_decoded \
