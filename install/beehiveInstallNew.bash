@@ -163,13 +163,17 @@ if true; then
 
     ### systemd  - start all the services once the containers are available
     cd /root/git/beehive-server/systemd/
-      
+
     for service in beehive-*.service ; do
-        echo "Deploy ${service}"
+        echo "store and enable service:   ${service}"
         rm -f /etc/systemd/system/${service}
         cp ${service} /etc/systemd/system
         systemctl daemon-reload
         systemctl enable ${service}
+    done
+    
+    for service in beehive-*.service ; do
+        echo "start ${service}"
         systemctl start ${service}
         systemctl status ${service}  --no-page -l
         sleep 3
@@ -178,6 +182,7 @@ if true; then
     sleep 10
     
     systemctl status '*beehive*'  --no-page -l
+    systemctl list-units -a '*beehive*'
     
     date
 
