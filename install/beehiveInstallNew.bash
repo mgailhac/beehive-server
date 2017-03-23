@@ -5,6 +5,11 @@ set -v -x
 echo "STARTING INSTALL..."
 date
 
+until apt update; do
+    echo "Waiting for apt to become unlocked to begin installation..." `date`
+    sleep 10
+done
+
 if true; then
     if true; then
         #####################################################################
@@ -65,7 +70,6 @@ if true; then
     
     apt-get install -y curl
     apt-get install -y git
-    apt update
     
     cd /root
     rm -rf git
