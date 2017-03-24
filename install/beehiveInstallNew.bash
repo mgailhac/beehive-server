@@ -5,10 +5,12 @@ set -v -x
 echo "STARTING INSTALL..."
 date
 
-until apt update; do
-    echo "Waiting for apt to become unlocked to begin installation..." `date`
-    sleep 10
-done
+function RETRY_UNTIL_SUCCEED() { 
+    until $*; 
+    do echo "FAILED.  Waiting to retry...     " `date`
+    sleep 20
+    done; 
+}
 
 if true; then
     if true; then
@@ -67,9 +69,10 @@ if true; then
     #####################################################################
     #########   INSTALL
     #####################################################################
-    
-    apt-get install -y curl
-    apt-get install -y git
+
+    RETRY_UNTIL_SUCCEED  apt update
+    RETRY_UNTIL_SUCCEED  apt-get install -y curl
+    RETRY_UNTIL_SUCCEED  apt-get install -y git
     
     cd /root
     rm -rf git
@@ -102,13 +105,13 @@ if true; then
     
     
     #### Docker
-    apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+    RETRY_UNTIL_SUCCEED apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
     export CODENAME=$(lsb_release --codename | grep -o "[a-z]*$" | tr -d '\n')
     echo "deb https://apt.dockerproject.org/repo ubuntu-${CODENAME} main" > /etc/apt/sources.list.d/docker.list
-    apt-get update
-    apt-get install -y  docker-engine
-    service docker restart
-    docker --version
+    RETRY_UNTIL_SUCCEED apt-get update
+    RETRY_UNTIL_SUCCEED apt-get install -y  docker-engine
+    RETRY_UNTIL_SUCCEED service docker restart
+    RETRY_UNTIL_SUCCEED docker --version
     
     export DATA="/mnt"
     echo "export DATA=/mnt/" >> /root/.bash_profile
