@@ -272,7 +272,5 @@ def get_node_logs(node_id):
 def get_cassandra_time():
     statement = 'SELECT dateof(now()) FROM system.local ;'
     cluster, rows = query(statement)
-    for row in rows:
-        print(row)
     return rows[0]
     
