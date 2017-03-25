@@ -274,5 +274,5 @@ def get_cassandra_time():
     cluster, rows = query(statement)
     for row in rows:
         print(row)
-    return rows
+    return rows[0]
     
