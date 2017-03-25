@@ -1,0 +1,27 @@
+[Unit]
+Description=Beehive Flask Watchdog
+
+[Service]
+Environment='CONTAINER=beehive-flask'
+Environment='DATA=/mnt'
+
+Restart=on-failure
+RestartSec=5
+
+# Temporarily substitute this correct URL with a hard-coded value for the server
+# $(docker inspect --format "{{ .NetworkSettings.Networks.beehive.IPAddress }}" beehive-flask)
+
+ExecStart=/bin/bash -c ' \
+  while [ 1 ] ; do \
+    sleep 2 ; \
+    if [ $(/usr/bin/curl --silent --max-time 10 localhost:/api/1/cassandra_time | wc -l) -eq "1" ] ; then \
+      sleep 45 ; \
+    else \
+      echo "failed - restarting flask..." ; \
+      docker rm -f beehive-flask ; \
+      sleep 60 ; \
+    fi \
+  done '
+
+[Install]
+WantedBy=multi-user.target
