@@ -103,9 +103,9 @@ def api_epoch():
         'epoch': int(time.time())
     })
     
-@api.route('/1/keyspaces')
-def api_keyspaces():
-    return jsonify({'data' : export.get_keyspaces()})
+@api.route('/1/cassandra_time')
+def api_get_cassandra_time():
+    return jsonify({'data' : export.get_cassandra_time()})
 
 
 def NodeQuery(node_id_queried=None, bAllNodes=False):
