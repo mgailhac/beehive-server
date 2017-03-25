@@ -105,7 +105,8 @@ def api_epoch():
     
 @api.route('/1/cassandra_time')
 def api_get_cassandra_time():
-    return export.get_cassandra_time()
+    return jsonify(export.get_cassandra_time())
+
 
 def NodeQuery(node_id_queried=None, bAllNodes=False):
     # if node_id_queried, then filter only that node, otherwise, query all nodes
