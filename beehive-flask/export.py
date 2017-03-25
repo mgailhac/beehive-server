@@ -250,7 +250,7 @@ def get_nodes(bAllNodes = False):
 def get_node_logs(node_id):
     logger.info("__ export.get_node_logs()  node_id = {}".format(node_id))
 
-    maxBytes = 10000
+    maxBytes = 100000
     logFilePath = '/mnt/beehive/node-logs/'
     try:
         filename = logFilePath + node_id.strip().lower()
