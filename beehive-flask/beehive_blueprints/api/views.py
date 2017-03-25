@@ -104,7 +104,7 @@ def api_epoch():
     })
     
 @api.route('/1/keyspaces')
-def api_epoch():
+def api_keyspaces():
     return export.get_keyspaces()
 
 
