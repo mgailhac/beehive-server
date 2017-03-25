@@ -18,9 +18,10 @@ ExecStart=/bin/bash -c ' \
       echo "pass..." ; \
       sleep 45 ; \
     else \
-      echo "failed - restarting flask..." ; \
-      docker rm -f beehive-flask ; \
-      sleep 60 ; \
+      echo "failed - restarting flask & nginx..." ; \
+      systemctl restart beehive-flask ; \
+      systemctl restart beehive-nginx ; \
+      sleep 90 ; \
     fi \
   done '
 
