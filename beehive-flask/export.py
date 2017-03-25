@@ -267,4 +267,12 @@ def get_node_logs(node_id):
     except:
         result = ''
     return result
+
+# This is just to test beehive-flask's connection to Cassandra - which often breaks    
+def get_keyspaces():
+    statement = 'SELECT keyspaces'
+    cluster, rows = query(statement)
+    for row in rows:
+        print(row)
+    return rows
     

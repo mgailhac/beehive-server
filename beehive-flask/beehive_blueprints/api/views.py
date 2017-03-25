@@ -102,6 +102,10 @@ def api_epoch():
     return jsonify({
         'epoch': int(time.time())
     })
+    
+@api.route('/1/keyspaces')
+def api_epoch():
+    return export.get_keyspaces()
 
 
 def NodeQuery(node_id_queried=None, bAllNodes=False):
