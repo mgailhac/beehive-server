@@ -24,6 +24,7 @@ do echo $UNAME
     
     rabbitmqctl list_user_permissions $UNAME
 done
+rabbitmqctl set_user_tags server administrator
 rabbitmqctl list_users
 
 # NOTE: This is where we declare all exchanges, queues and bindings EXCEPT FOR the queues and bindings 
