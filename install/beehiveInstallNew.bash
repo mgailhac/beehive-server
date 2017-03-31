@@ -5,12 +5,31 @@ set -v -x
 echo "STARTING INSTALL..."
 date
 
+#OS="Ubuntu"
+OS="CentOS"
+
+if [ "${OS}" == "CentOS" ]; then
+    APT="yum "
+    APT_GET="yum "
+else  # Ubuntu
+    APT="apt "
+    APT_GET="apt-get "
+fi
+
+
+
 function RETRY_UNTIL_SUCCEED() { 
     until $*; 
     do echo "FAILED.  Waiting to retry...     " `date`
     sleep 20
     done; 
 }
+
+
+
+echo "APT = " ${APT}
+echo "APT_GET = " ${APT_GET}
+
 
 if true; then
     if true; then
@@ -70,9 +89,9 @@ if true; then
     #########   INSTALL
     #####################################################################
 
-    RETRY_UNTIL_SUCCEED  apt update
-    RETRY_UNTIL_SUCCEED  apt-get install -y curl
-    RETRY_UNTIL_SUCCEED  apt-get install -y git
+    RETRY_UNTIL_SUCCEED  ${APT} update -y
+    RETRY_UNTIL_SUCCEED  ${APT_GET} install -y curl
+    RETRY_UNTIL_SUCCEED  ${APT_GET} install -y git
     
     cd /root
     rm -rf git
@@ -105,14 +124,18 @@ if true; then
     
     
     #### Docker
-    RETRY_UNTIL_SUCCEED apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-    export CODENAME=$(lsb_release --codename | grep -o "[a-z]*$" | tr -d '\n')
-    echo "deb https://apt.dockerproject.org/repo ubuntu-${CODENAME} main" > /etc/apt/sources.list.d/docker.list
-    RETRY_UNTIL_SUCCEED apt-get update
-    RETRY_UNTIL_SUCCEED apt-get install -y  docker-engine
+    if [ "${OS}" == "CentOS" ]; then
+        curl -sSL https://get.docker.com/ | sh
+    else
+        RETRY_UNTIL_SUCCEED apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+        export CODENAME=$(lsb_release --codename | grep -o "[a-z]*$" | tr -d '\n')
+        echo "deb https://apt.dockerproject.org/repo ubuntu-${CODENAME} main" > /etc/apt/sources.list.d/docker.list
+        RETRY_UNTIL_SUCCEED apt-get update
+        RETRY_UNTIL_SUCCEED apt-get install -y  docker-engine
+    fi
     RETRY_UNTIL_SUCCEED service docker restart
     RETRY_UNTIL_SUCCEED docker --version
-    
+
     export DATA="/mnt"
     echo "export DATA=/mnt/" >> /root/.bash_profile
     docker network create beehive
