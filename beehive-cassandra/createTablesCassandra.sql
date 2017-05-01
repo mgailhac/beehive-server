@@ -3,6 +3,21 @@ CREATE KEYSPACE IF NOT EXISTS waggle
 
 USE waggle;
 
+-- This table is for v1 data, which is deprecated, and only used in the original beehive1 server.  
+-- This table should exist as long as the webserver looks for v1 data.
+CREATE TABLE IF NOT EXISTS waggle.sensor_data (
+    node_id         ascii,
+    date            ascii,
+    plugin_id       ascii,
+    plugin_version  int,
+    plugin_instance ascii,
+    timestamp       timestamp,
+    sensor          ascii,
+    data            list<ascii>,
+    sensor_meta     ascii,
+    PRIMARY KEY ((node_id, date), plugin_id, plugin_version, plugin_instance, timestamp, sensor)
+);
+
 CREATE TABLE IF NOT EXISTS sensor_data_raw (
     node_id         ascii,    
     date            ascii,    
