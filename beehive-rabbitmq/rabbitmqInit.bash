@@ -4,6 +4,7 @@ curl localhost:15672/cli/rabbitmqadmin > /usr/bin/rabbitmqadmin
 chmod 777 /usr/bin/rabbitmqadmin
 
 for UNAME in            \
+    admin               \
     last_data           \
     last_log            \
     log_saver           \
@@ -24,7 +25,7 @@ do echo $UNAME
     
     rabbitmqctl list_user_permissions $UNAME
 done
-rabbitmqctl set_user_tags server administrator
+rabbitmqctl set_user_tags admin administrator
 rabbitmqctl list_users
 
 # NOTE: This is where we declare all exchanges, queues and bindings EXCEPT FOR the queues and bindings 
