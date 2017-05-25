@@ -8,6 +8,9 @@ date
 #OS="Ubuntu"
 OS="CentOS"
 
+#GIT_BRANCH="master"
+GIT_BRANCH="wcc-install0"
+
 if [ "${OS}" == "CentOS" ]; then
     APT="yum "
     APT_GET="yum "
@@ -97,9 +100,9 @@ if true; then
     rm -rf git
     mkdir -p git
     cd git
-    git clone https://github.com/waggle-sensor/beehive-server.git
+    RETRY_UNTIL_SUCCEED git clone https://github.com/waggle-sensor/beehive-server.git
     cd /root/git/beehive-server/
-    git checkout wcc-install0
+    git checkout ${GIT_BRANCH}
 
     # beehive-config.json
     mkdir -p /mnt/beehive
@@ -181,8 +184,9 @@ if true; then
 
     ### RabbitMQ - this must run BEFORE RabbitMQ container is up
     mkdir -p ${DATA}/rabbitmq/config/ && \
-    curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-rabbitmq/rabbitmq.config > ${DATA}/rabbitmq/config/rabbitmq.config
-
+    #curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-rabbitmq/rabbitmq.config > ${DATA}/rabbitmq/config/rabbitmq.config
+    cp /root/git/beehive-server/beehive-rabbitmq/rabbitmq.config  ${DATA}/rabbitmq/config/
+    
     [ ! -z "$DATA" ] && docker run -ti \
       --name certs \
       --rm \
@@ -218,25 +222,31 @@ if true; then
 
     # after beehive-mysql is running
     while true; do
-        curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-mysql/createTablesMysql.sql | docker exec -i beehive-mysql mysql -u waggle --password=waggle \
+        #curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-mysql/createTablesMysql.sql | docker exec -i beehive-mysql mysql -u waggle --password=waggle \
         && break
+        cat /root/git/beehive-server/beehive-mysql/createTablesMysql.sql | docker exec -i beehive-mysql mysql -u waggle --password=waggle \
+        && break
+
       sleep 10
       nTries=$[$nTries+1]
       echo "  mysql try #" $nTries " ..."
     done
-      
     
     # after beehive-cassandra is running
     sleep 20
     while true; do
-        curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-cassandra/createTablesCassandra.sql | docker exec -i beehive-cassandra cqlsh \
+        # curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-cassandra/createTablesCassandra.sql | docker exec -i beehive-cassandra cqlsh \
         && break
+        
+        cat /root/git/beehive-server/beehive-cassandra/createTablesCassandra.sql | docker exec -i beehive-cassandra cqlsh \
+        && break
+        
       sleep 10
       nTries=$[$nTries+1]
       echo "  mysql try #" $nTries " ..."
     done
 
-
+    
     # after beehive-rabbitmq is up
     nTries=0
     sleep 20
