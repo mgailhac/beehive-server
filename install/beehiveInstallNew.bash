@@ -224,7 +224,11 @@ if true; then
     # after beehive-mysql is running
     while true; do
         #curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-mysql/createTablesMysql.sql | docker exec -i beehive-mysql mysql -u waggle --password=waggle && break
+<<<<<<< .mine
         
+=======
+
+>>>>>>> .theirs
         cat /root/git/beehive-server/beehive-mysql/createTablesMysql.sql | docker exec -i beehive-mysql mysql -u waggle --password=waggle \
         && break
 
