@@ -5,6 +5,7 @@ set -v -x
 echo "STARTING INSTALL..."
 date
 
+#TODO: change this to a prompt
 #OS="Ubuntu"
 OS="CentOS"
 
