@@ -223,8 +223,7 @@ if true; then
 
     # after beehive-mysql is running
     while true; do
-        #curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-mysql/createTablesMysql.sql | docker exec -i beehive-mysql mysql -u waggle --password=waggle \
-        && break
+        #curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-mysql/createTablesMysql.sql | docker exec -i beehive-mysql mysql -u waggle --password=waggle && break
         cat /root/git/beehive-server/beehive-mysql/createTablesMysql.sql | docker exec -i beehive-mysql mysql -u waggle --password=waggle \
         && break
 
@@ -236,8 +235,7 @@ if true; then
     # after beehive-cassandra is running
     sleep 20
     while true; do
-        # curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-cassandra/createTablesCassandra.sql | docker exec -i beehive-cassandra cqlsh \
-        && break
+        # curl https://raw.githubusercontent.com/waggle-sensor/beehive-server/master/beehive-cassandra/createTablesCassandra.sql | docker exec -i beehive-cassandra cqlsh && break
         
         cat /root/git/beehive-server/beehive-cassandra/createTablesCassandra.sql | docker exec -i beehive-cassandra cqlsh \
         && break
