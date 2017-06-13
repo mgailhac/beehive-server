@@ -169,7 +169,12 @@ if __name__ == '__main__':
     
     iLine=0
     if (args.testMessage):   # test message
-        properties = pika.BasicProperties(timestamp=int(time.time()))
+        properties = pika.BasicProperties(
+                    headers = {
+                        'value' : 20, 
+                        'reply_to' : node_id},
+                    timestamp=int(time.time()),
+                    reply_to=node_id)
         logging.debug('properties = {}'.format(properties))
         
         channel.basic_publish(exchange='logs', 
