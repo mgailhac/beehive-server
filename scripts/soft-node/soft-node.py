@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+from binascii import unhexlify
 import datetime
+import json
 import logging
 import os
 import pika
@@ -329,7 +331,29 @@ def get_certificates(dir):
         'keyfile':client_key_file}
     return ssl_options
     
-    
+def DataSerialize(data):
+    if isinstance(data, int):
+        content_type = 'i'
+        body = str(data).encode()
+    elif isinstance(data, float):
+        content_type = 'f'
+        body = str(data).encode()
+    elif isinstance(data, str):
+        content_type = 's'
+        body = data.encode()
+    elif isinstance(data, bytearray):
+        content_type = 'b'
+        body = bytes(data)
+    elif isinstance(data, bytes):
+        content_type = 'b'
+        body = data
+    elif isinstance(data, dict) or isinstance(data, list):
+        content_type = 'j'
+        body = json.dumps(data).encode()
+    else:
+        raise ValueError('unsupported data type')
+
+    return content_type, body
     
 #_______________________________________________________________________
 #_______________________________________________________________________
@@ -347,9 +371,12 @@ if __name__ == '__main__':
     argParser.add_argument('--verbose', '-v', action='count')
     args = argParser.parse_args()
     
+    verbosity = args.verbose
     beehive_url = args.beehive_url
     node_id = args.node_id
     dir = args.dir
+    
+    if verbosity: print('args = ', args)
     
     # node_id must be of the form (without spaces)
     #    00 00 02 00 00 00 xx xx
@@ -403,24 +430,67 @@ if __name__ == '__main__':
             'keyfile':client_key_file}
         
     print('ssl_options = ', ssl_options)
-    params = pika.ConnectionParameters(host=beehive_url, port=23181, credentials=credentials, ssl=True, ssl_options=ssl_options)
-    print('params = ', params)
+    params = pika.ConnectionParameters(host=beehive_url, 
+                    port=23181, 
+                    credentials=credentials, 
+                    ssl=True, 
+                    ssl_options=ssl_options,
+                    retry_delay=10,
+                    socket_timeout=10)
 
+    print('params = ', params)
     connection = pika.BlockingConnection(params)
     print('connection = ', connection)
     
     channel = connection.channel()
     print('channel = ', channel)
     
-    properties = pika.BasicProperties(timestamp=int(time.time()))
-    print('properties = ', properties)
     
-    # request = {"message_type":"request", "command":"stop", "arguments":[device]}
-    #channel.basic_publish(exchange='logs', routing_key='', body=json.dumps(request), properties=properties)
-    channel.basic_publish(exchange='logs', routing_key='', body='hello world', properties=properties)
-    print('basic_publish completed')
+    if False:   # test message
+        properties = pika.BasicProperties(timestamp=int(time.time()))
+        print('properties = ', properties)
+        
+        channel.basic_publish(exchange='logs', 
+                        routing_key='', 
+                        body='hello world', 
+                        properties=properties)
+        print('basic_publish completed')
+        
+    else:   # coresense data
+        # TODO get it from a file
+        #with open(filename, 'r') as f:
+        #   for line in f:
+        nSamples = 1
+        
+        # headers = {'node_id' : node_id}
+        for x in range(0, nSamples):
+            testData = unhexlify(b'aa40d1fd886442582f336ee9ab008600001814c40e01821a2a02841a292248038201a304851a1401457005820356068202cc078880008100800101000882033809821a450a8680b2809e82a40b842a0e1c220c8200ea0d8252e30e82573f0f827a46108226681382265720860004a3e2b5a11d840a7311b51e850ab201460f1f8602131e626d3415830000001a830051f31c8300015c1983003a6a188380026717830009271b830016b721820a3022820a4b23820a7b24820aa725820ab82689805f03d7004e00000027890000000a800b0000002f55')
 
-    
+            if False:
+                content_type, body = DataSerialize(testData)
+                print('content_type = ', content_type)
+                print('body = ', body)
+            else:
+                if False:
+                    content_type, body = DataSerialize({'test' : x})
+                else:
+                    content_type, body = DataSerialize(testData)
+                    print('content_type = ', content_type)
+                    print('body = ', body)
+
+                properties = pika.BasicProperties(
+                        reply_to=node_id,   # node_id goes here
+                        #headers=headers,
+                        delivery_mode=2,
+                        timestamp=int(time.time() * 1000),
+                        content_type=content_type,
+                        type='frame', #sensor,  for raw coresense data, it's "frame"
+                        app_id='coresense:3')   # plugin id goes here too
+
+                channel.basic_publish(properties=properties,
+                                           exchange='data-pipeline-in',
+                                           routing_key=properties.app_id,  # plugin id goes here too
+                                           body=body)
     
     print('>>> program ended !!!!')
     
