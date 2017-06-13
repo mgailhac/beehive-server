@@ -167,6 +167,7 @@ if __name__ == '__main__':
     channel = connection.channel()
     logging.debug('channel = {}'.format(channel))
     
+    iLine=0
     if (args.testMessage):   # test message
         properties = pika.BasicProperties(timestamp=int(time.time()))
         logging.debug('properties = {}'.format(properties))
