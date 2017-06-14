@@ -171,7 +171,7 @@ if __name__ == '__main__':
     if (args.testMessage):   # test message
         properties = pika.BasicProperties(
                     headers = {
-                        'value' : 20, 
+                        'value' : 80, 
                         'reply_to' : node_id},
                     timestamp=int(time.time()),
                     reply_to=node_id)
