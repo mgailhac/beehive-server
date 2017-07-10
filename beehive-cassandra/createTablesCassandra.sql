@@ -45,6 +45,14 @@ CREATE TABLE IF NOT EXISTS sensor_data_decoded (
     PRIMARY KEY ((node_id, date), meta_id, sensor, parameter, timestamp, data_set, ingest_id, unit)
 );
 
+CREATE TABLE IF NOT EXISTS node_metrics_date (  -- primary key is date
+    date            ascii,
+    timestamp       TIMESTAMP,      -- milliseconds from epoch, integer
+    node_id         ascii,
+    data            ascii,          -- metrics data
+    PRIMARY KEY (date, timestamp, node_id)
+);
+
 CREATE TABLE IF NOT EXISTS admin_messages (
     node_id         ascii,
     date            ascii,

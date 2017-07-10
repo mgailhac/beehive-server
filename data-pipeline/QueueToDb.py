@@ -31,27 +31,35 @@ logger.setLevel(logging.DEBUG)
 class DataProcess(Process):
     """
         This process handles all data submissions
-        is_database_raw is a bool, if True, will write data to raw-db, else to decoded-db)
+        whichData specifies either 'raw', 'decoded' or 'node-metrics'
     """
 
-    def __init__(self, is_database_raw, verbosity = 0):
+    def __init__(self, whichData, verbosity = 0):
         """
             Starts up the Data handling Process
         """
         super(DataProcess,self).__init__()
         
-        if is_database_raw:
+        if whichData == 'raw':
             self.input_exchange = 'data-pipeline-in'
             self.queue          = 'db-raw'
             self.statement = "INSERT INTO    sensor_data_raw   (node_id, date, plugin_name, plugin_version, plugin_instance, timestamp, parameter, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             self.function_ExtractValuesFromMessage = self.ExtractValuesFromMessage_raw
             credentials = pika.PlainCredentials('queue_to_db_raw', 'waggle')
-        else:  
+        elif whichData == 'decoded':  
             self.input_exchange = 'plugins-out'
             self.queue          = 'db-decoded'
             self.statement = "INSERT INTO    sensor_data_decoded   (node_id, date, ingest_id, meta_id, timestamp, data_set, sensor, parameter, data, unit) VALUES (?, ?, ?, ?, ?,   ?, ?, ?, ?, ?)"
             self.function_ExtractValuesFromMessage = self.ExtractValuesFromMessage_decoded
             credentials = pika.PlainCredentials('queue_to_db_decoded', 'waggle')
+        elif whichData == 'node-metrics':
+            self.input_exchange = 'node-metrics'
+            self.queue          = 'node-metrics'
+            self.statement = "INSERT INTO    node_metrics_date   (date, timestamp, node_id, data) VALUES (?, ?, ?, ?)"
+            self.function_ExtractValuesFromMessage = self.ExtractValuesFromMessage_node_metrics
+            credentials = pika.PlainCredentials('node-metrics', 'waggle')
+        else:
+            print('ERROR: unsupported value for <whichData>:  ', whichData)
             
         logger.info("Initializing DataProcess")
         
@@ -192,6 +200,28 @@ class DataProcess(Process):
                 print('   data = ',             data        )
                 print('   unit = ',             unit        )
             yield values
+
+    def ExtractValuesFromMessage_node_metrics(self, props, body):
+
+        dictData = json.loads(body.decode())
+        
+        # same for each parameter:value pair
+        node_id         = props.reply_to
+        sampleDate      = sampleDatetime.strftime('%Y-%m-%d')
+        timestamp       = int(props.timestamp)
+        
+        for k in dictData.keys():
+            parameter      = k
+            data           = str(dictData[k])
+
+            values = (node_id, sampleDate, ingest_id, meta_id, timestamp, data_set, sensor, parameter, data, unit)
+
+            if self.verbosity > 0:
+                print('   date = ',             sampleDate  )
+                print('   timestamp = ',        timestamp   )
+                print('   node_id = ',          node_id     )
+                print('   data = ',             data        )
+            yield values
             
     def cassandra_insert(self, values):
     
@@ -277,10 +307,10 @@ if __name__ == '__main__':
         help = 'which database the data is flowing to')
     argParser.add_argument('--verbose', '-v', action='count')
     args = argParser.parse_args()
-    is_database_raw = args.database == 'raw'
+    whichData = args.database
     verbosity = 0 if not args.verbose else args.verbose
     
-    p = DataProcess(is_database_raw, verbosity)
+    p = DataProcess(whichData, verbosity)
     p.start()
     
     print(__name__ + ': created process ', p)
