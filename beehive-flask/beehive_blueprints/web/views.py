@@ -27,6 +27,8 @@ logging.getLogger('export').setLevel(logging.DEBUG)
 web_host = 'http://beehive1.mcs.anl.gov/'
 api_url  = web_host + 'api/'
 
+# zs dashboard coming soon
+
 @web.route("/wcc/test/")
 def web_wcc_test():
     rl = [] # result list
