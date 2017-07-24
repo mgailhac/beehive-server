@@ -33,6 +33,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 
 app.register_blueprint(api, url_prefix="/api")
 app.register_blueprint(web, url_prefix="")
+app.register_blueprint(nodeDash, url_prefix="/nodeDash")
 
 # Creates a sqlalchemy engine with the URI found in the app's config
 # This lets you manage database sessions, execute sql, and lots more
