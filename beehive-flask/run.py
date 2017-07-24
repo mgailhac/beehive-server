@@ -11,6 +11,7 @@ from sqlalchemy.ext.automap import automap_base
 from beehive_blueprints.admin import admin
 from beehive_blueprints.api import api
 from beehive_blueprints.web import web
+from beehive_blueprints.nodeDash import nodeDash
 from database import db
 from models import BeehiveAdminIndexView, BeehiveModelView, Role, User
 
