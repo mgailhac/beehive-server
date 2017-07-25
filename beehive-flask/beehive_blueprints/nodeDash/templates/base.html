@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="shortcut icon" href="/static/img/logo.png">
-    <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css">
+    <link rel="shortcut icon" href= "{{ url_for('nodeDash.static', filename='img/logo.png') }}">
+    <link rel="stylesheet" href= "{{ url_for('nodeDash.static', filename='css/dashboard.css') }}">
     <meta charset="utf-8">
     <title>Beehive Node Dashboard</title>
 </head>
 <body>
 
 <h1 style="border-bottom-style: solid; margin-top: 40px;">
-    <img src="/static/img/logo.png" alt="Logo" align="left">
+    <img src="{{ url_for('nodeDash.static', filename='img/logo.png') }}" alt="Logo" align="left">
     Beehive Node Dashboard</h1>
 
 <div id="date"></div>
@@ -23,6 +23,6 @@ t = setTimeout(function() {
 }
 getDate();
 </script>
-
+<p>indicator 1</p>
 </body>
 </html>
