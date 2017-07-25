@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="/static/img/logo.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css">
+    <meta charset="utf-8">
+    <title>Beehive Node Dashboard</title>
+</head>
+<body>
+
+<h1 style="border-bottom-style: solid; margin-top: 40px;">
+    <img src="/static/img/logo.png" alt="Logo" align="left">
+    Beehive Node Dashboard</h1>
+
+<div id="date"></div>
+
+<script type="text/javascript">
+function getDate() {
+document.getElementById("date").innerHTML = "Date: " + Date();
+t = setTimeout(function() {
+    getDate()
+  }, 1000);
+}
+getDate();
+</script>
+
+</body>
+</html>
