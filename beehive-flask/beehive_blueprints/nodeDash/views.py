@@ -279,15 +279,31 @@ def filterdata(data, location, status, cat):
     return fildata
 
 
-
 @nodeDash.route('/server')
 def server():
-    return render_template('base.html')
+    global binlength
+    binlength = request.args.get('bin', 30, int)*60
+    if 1800 > binlength:
+        binlength = 1800
+    elif binlength > 86400:
+        binlength = 86400
+    # serverTable = servertable()
+    return render_template('serverdash.html', serverlog=serverlog())
+
+
+def serverlog():
+    tbl = []
+    for x in range(100, 0, -1):
+        tbl.append("<tr>")
+        tbl.append("<td> Data Received " + str(x) + "</td>")
+        tbl.append("</tr>")
+    return ''.join(tbl)
 
 
 @nodeDash.route('/data.tsv')
 def data():
-    return open("static/temp.csv").read()
+    return open("beehive_blueprints/" + url_for('nodeDash.static', filename='temp.csv')).read()
+    # return open('/usr/lib/waggle/beehive-server/beehive-flask/beehive_blueprints/nodeDash/static/temp.csv').read()
 
 
 @nodeDash.route('/documentation')
@@ -298,9 +314,3 @@ def documentation():
 @nodeDash.route('/node/<nodeID>')
 def showNodePage(nodeID):
     return render_template('base.html')
-
-
-@nodeDash.route("/test")
-def route():
-    return "route found."
-
