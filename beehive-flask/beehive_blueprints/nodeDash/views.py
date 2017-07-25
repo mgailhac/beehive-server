@@ -14,10 +14,14 @@ fieldNames = ["time", "< One Minute", "< Five Minutes", "< Thirty Minutes", "< O
 
 @nodeDash.route('/')
 def nodeDash_root():
-    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+    location = str(request.args.get('location'))
+    status = str(request.args.get('status'))
+    cat = str(request.args.get('cat'))
+    # table = dashtable(apirequest(api_url), location, status, cat)
     return render_template('base.html')
 
 
 @nodeDash.route("/test")
 def route():
     return "route found."
+
