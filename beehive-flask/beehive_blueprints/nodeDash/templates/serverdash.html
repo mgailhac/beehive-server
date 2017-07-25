@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="/static/img/logo.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/serverdash.css">
+    <meta charset="utf-8">
+    <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="/static/js/sorttable.js"></script>
+    <title>Beehive Server Dashboard</title>
+</head>
+<body>
+
+<ul style="hover{color: #F7C767}">
+    <li><a href={{ url_for("dashboard") }}>Beehive Node Dashboard</a></li>
+    <li><a href={{ url_for("server") }}>Beehive Server Dashboard</a></li>
+    <li><a href={{ url_for("documentation") }}>Documentation</a></li>
+    <li><a href='http://127.0.0.1:4000'>Beehive API</a></li>
+</ul>
+
+<h1 style="border-bottom-style: solid; margin-top: 40px;">
+    <img src="/static/img/logo.png" alt="Logo" align="left">
+    Beehive Server Dashboard</h1>
+
+<div id="date"></div>
+<script type="text/javascript">
+function getDate() {
+document.getElementById("date").innerHTML = "Date: " + Date();
+t = setTimeout(function() {
+    getDate()
+  }, 1000);
+}
+getDate();
+</script>
+<h3>Normalized Node Uptime Area Chart</h3>
+<div id="topgrid">
+    <div id="row">
+        <svg id="areaplot" width="960" height="500"></svg>
+        <div id="logcontainer">
+        <table id="serverlog" style="background-color: #838E83;">
+            <thead>
+            <tr id="loghead"><th>Server Log</th></tr>
+            </thead>
+            <tbody id="tbody1">
+            {% autoescape false %}
+            {{ serverlog }}
+            {% endautoescape %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+<div id="buttonlist">
+<button style="background-color: #66bd63; cursor: pointer;" type="button" onclick="window.location= '{{url_for("dashboard")}}?cat=7'">> One Day</button>
+<button style="background-color: #a6d96a; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=6'">< One Day</button>
+<button style="background-color: #d9ef8b; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=5'">< Six Hours</button>
+<button style="background-color: #fee08b; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=4'">< One Hour</button>
+<button style="background-color: #fdae61; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=3'">< Thirty Minutes</button>
+<button style="background-color: #f46d43; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=2'">< Five Minutes</button>
+<button style="background-color: #d73027; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=1'">< One Minute</button>
+</div>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 100, bottom: 100, left: 50},
+    width = svg.attr("width") - margin.left - margin.right,
+    height = svg.attr("height") - margin.top - margin.bottom;
+
+svg.append("rect")
+    .attr("width", "98%")
+    .attr("height", "87%")
+    .attr("border", "#090F0F")
+    .attr("stroke", "#090F0F")
+    .attr("stroke-width", "2")
+    .attr("fill", '#838E83');
+
+var parseTime = d3.timeParse("%S");
+
+var x = d3.scaleTime().range([0, width]),
+    y = d3.scaleLinear().range([height, 0]),
+    z = d3.scaleOrdinal().range(['#d73027','#f46d43','#fdae61','#fee08b','#d9ef8b','#a6d96a','#66bd63','#1a9850'])
+
+var stack = d3.stack();
+
+var area = d3.area()
+    .x(function(d, i) { return x(d.data.time); })
+    .y0(function(d) { return y(d[0]); })
+    .y1(function(d) { return y(d[1]); });
+
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("data.tsv", type, function(error, data) {
+  if (error) throw error;
+
+  var keys = data.columns.slice(1);
+
+  x.domain(d3.extent(data, function(d) { return d.time; }));
+  z.domain(keys);
+  stack.keys(keys);
+
+  var layer = g.selectAll(".layer")
+    .data(stack(data))
+    .enter().append("g")
+      .attr("class", "layer");
+
+  layer.append("path")
+      .attr("class", "area")
+      .attr("stroke", "#090F0F")
+      .style("fill", function(d) { return z(d.key); })
+      .on('mouseover', function (d) { d3.select(this).style("fill", "#C9CEBD") })
+      .on('mouseout', function (d) { d3.select(this).style("fill", function(d) { return z(d.key); }) })
+      .attr("d", area);
+
+  layer.filter(function(d) { return d[d.length - 1][1] - d[d.length - 1][0] > 0.01; })
+    .append("text")
+      .attr("x", width + 3)
+      .attr("y", function(d) { return y((d[d.length - 1][0] + d[d.length - 1][1]) / 2); })
+      .attr("dy", ".35em")
+      .style("font", "10px sans-serif")
+      .style("text-anchor", "left")
+      .text(function(d) { return d.key; });
+
+  g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x).ticks(d3.timeHour.every(6)));
+
+  g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y).ticks(10, "%"));
+});
+
+function type(d, i, columns) {
+  <!--d.time = parseTime(d.time);-->
+  d.time = d.time*1000;
+  for (var i = 1, n = columns.length; i < n; ++i) d[columns[i]] = d[columns[i]] / 100;
+  return d;
+}
+
+</script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var paths = d3.select("body").selectAll("path").each(function(d, i) {
+        console.log(this, d, i);
+        });
+        console.log(paths);
+    });
+</script>
+
+
+<table style="background-color: #838E83;" class="sortable">
+    <tr>
+        <th>Timestamp</th>
+        <th>Active Nodes (%)</th>
+        <th>Median Uptime</th>
+        <th>Malfunctioning Nodes Count</th>
+    </tr>
+    {% autoescape false %}
+    {{ servertable }}
+    {% endautoescape %}
+</table>
+</body>
+</html>

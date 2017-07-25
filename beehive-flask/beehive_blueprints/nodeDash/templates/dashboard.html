@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+
+    .chart rect {
+      fill: steelblue;
+    }
+
+    .chart text {
+      fill: white;
+      font: 10px sans-serif;
+      text-anchor: middle;
+    }
+
+    </style>
+    <script src="/static/js/sorttable.js"></script>
+    <link rel="shortcut icon" href="/static/img/logo.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css">
+    <meta charset="utf-8">
+    <title>Beehive Node Dashboard</title>
+
+</head>
+<body>
+<ul class="navbar">
+    <li><a href= {{ url_for("dashboard") }}>Beehive Node Dashboard</a></li>
+    <li><a href= {{ url_for("server") }}>Beehive Server Dashboard</a></li>
+    <li><a href= {{ url_for("documentation") }}>Documentation</a></li>
+    <li><a href='http://127.0.0.1:4000'>Beehive API</a></li>
+</ul>
+
+<h1 style="border-bottom-style: solid; margin-top: 40px;">
+    <img src="/static/img/logo.png" alt="Logo" align="left">
+    Beehive Node Dashboard</h1>
+
+<div id="date"></div>
+
+<script type="text/javascript">
+function getDate() {
+document.getElementById("date").innerHTML = "Date: " + Date();
+t = setTimeout(function() {
+    getDate()
+  }, 1000);
+}
+getDate();
+</script>
+
+<table class="sortable" style="background-color: #838E83;">
+    {% autoescape false %}
+    {{ dashtable }}
+    {% endautoescape %}
+</table>
+
+</body>
+</html>
