@@ -21,6 +21,21 @@ def nodeDash_root():
     return render_template('base.html')
 
 
+@nodeDash.route('/server')
+def server():
+    return render_template('base.html')
+
+
+@nodeDash.route('/data.tsv')
+def data():
+    return None
+
+
+@nodeDash.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
+
+
 @nodeDash.route("/test")
 def route():
     return "route found."
