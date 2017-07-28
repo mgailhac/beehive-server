@@ -303,7 +303,7 @@ class DataProcess(Process):
    
 if __name__ == '__main__':
     argParser = argparse.ArgumentParser()
-    argParser.add_argument('database', choices = ['raw', 'decoded'], 
+    argParser.add_argument('database', choices = ['raw', 'decoded', 'node-metrics'], 
         help = 'which database the data is flowing to')
     argParser.add_argument('--verbose', '-v', action='count')
     args = argParser.parse_args()
