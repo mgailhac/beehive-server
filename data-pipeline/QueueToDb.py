@@ -203,7 +203,7 @@ class DataProcess(Process):
 
     def ExtractValuesFromMessage_node_metrics(self, props, body):
 
-        data = body.decode().replace('\n','')
+        data = body.decode().replace('\n','').replace('\\n','')
         if self.verbosity > 1:
             print(':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: data = ', data)
         
