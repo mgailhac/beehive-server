@@ -203,7 +203,7 @@ class DataProcess(Process):
 
     def ExtractValuesFromMessage_node_metrics(self, props, body):
 
-        dictData = json.loads(body.decode())
+        dictData = body.decode()  ###json.loads(body.decode())
         if self.verbosity > 1:
             print('############ dictData = ', dictData)
         
