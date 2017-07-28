@@ -207,6 +207,7 @@ class DataProcess(Process):
         
         # same for each parameter:value pair
         node_id         = props.reply_to
+        sampleDatetime  = datetime.datetime.utcfromtimestamp(float(props.timestamp) / 1000.0)
         sampleDate      = sampleDatetime.strftime('%Y-%m-%d')
         timestamp       = int(props.timestamp)
         
