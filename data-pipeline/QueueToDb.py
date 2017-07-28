@@ -214,7 +214,8 @@ class DataProcess(Process):
             parameter      = k
             data           = str(dictData[k])
 
-            values = (node_id, sampleDate, ingest_id, meta_id, timestamp, data_set, sensor, parameter, data, unit)
+            # date, timestamp, node_id, data
+            values = (sampleDate, timestamp, node_id, data)
 
             if self.verbosity > 0:
                 print('   date = ',             sampleDate  )
