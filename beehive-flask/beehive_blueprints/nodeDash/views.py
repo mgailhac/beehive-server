@@ -313,4 +313,8 @@ def documentation():
 
 @nodeDash.route('/node/<nodeID>')
 def showNodePage(nodeID):
-    return render_template('base.html')
+    nodeTable = []
+    for x in range(5):
+        nodeTable.append("<tr><td>" + str(x) + "</td></tr>")
+    ''.join(nodeTable)
+    return render_template('base.html', nodeTable=nodeTable)

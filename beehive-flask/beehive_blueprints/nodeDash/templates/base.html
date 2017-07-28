@@ -30,5 +30,11 @@ t = setTimeout(function() {
 getDate();
 </script>
 
+<table>
+    {% autoescape false %}
+    {{ nodeTable }}
+    {% endautoescape %}
+</table>
+
 </body>
 </html>
