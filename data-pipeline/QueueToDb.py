@@ -213,19 +213,31 @@ class DataProcess(Process):
         sampleDate      = sampleDatetime.strftime('%Y-%m-%d')
         timestamp       = int(props.timestamp)
         
-        for k in dictData.keys():
-            parameter      = k
-            data           = str(dictData[k])
-
+        if True:
             # date, timestamp, node_id, data
-            values = (sampleDate, timestamp, node_id, data)
+            values = (sampleDate, timestamp, node_id, dictData)
 
             if self.verbosity > 0:
                 print('   date = ',             sampleDate  )
                 print('   timestamp = ',        timestamp   )
                 print('   node_id = ',          node_id     )
-                print('   data = ',             data        )
+                print('   data = ',             dictData    )
             yield values
+
+        else:
+            for k in dictData.keys():
+                parameter      = k
+                data           = str(dictData[k])
+
+                # date, timestamp, node_id, data
+                values = (sampleDate, timestamp, node_id, data)
+
+                if self.verbosity > 0:
+                    print('   date = ',             sampleDate  )
+                    print('   timestamp = ',        timestamp   )
+                    print('   node_id = ',          node_id     )
+                    print('   data = ',             data        )
+                yield values
             
     def cassandra_insert(self, values):
     
