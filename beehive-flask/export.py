@@ -175,7 +175,7 @@ def get_node_metrics_date_dict(date):
     """
     d = {}
 
-    statement = "SELECT UNIX_TIMESTAMP(timestamp), node_id, data FROM waggle.node_metrics_date WHERE date = '{}'".format(date)
+    statement = "SELECT blobAsBigInt(timestamp), node_id, data FROM waggle.node_metrics_date WHERE date = '{}'".format(date)
     cluster, rows = query(statement)
     for row in rows:
         logger.info('   row = ', row)
