@@ -316,7 +316,9 @@ def api_node_metrics_date():
 
     if not date:
         raise InvalidUsage("date is empty", status_code=STATUS_Not_Found)
-    return jsonify({"data" : export.get_node_metrics_date_dict(date)})
+    d = export.get_node_metrics_date_dict(date)
+    logger.info("  __ api_node_metrics_date()  d = {}".format(str(d)))
+    return jsonify({"data" : d})
     
 @api.route('/1/nodes/<node_id>/export')
 def api_export(node_id):
