@@ -312,7 +312,7 @@ def api_logs(node_id):
 def api_node_metrics_date():
     date = request.args.get('date')
 
-    logger.info("__ api_node_metrics_date()  date = {}".format(str(date))
+    logger.info("__ api_node_metrics_date()  date = {}".format(str(date)))
 
     if not date:
         raise InvalidUsage("date is empty", status_code=STATUS_Not_Found)
