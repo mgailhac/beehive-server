@@ -175,11 +175,11 @@ def get_node_metrics_date_dict(date):
     """
     d = {}
 
-    statement = "SELECT timestamp, node_id, data FROM waggle.node_metrics_date WHERE date = '{}'".format(date)
+    statement = "SELECT UNIX_TIMESTAMP(timestamp), node_id, data FROM waggle.node_metrics_date WHERE date = '{}'".format(date)
     cluster, rows = query(statement)
-    for result in rows:
+    for row in rows:
         logger.info('   row = ', row)
-        timestamp, node_id, data = result
+        timestamp, node_id, data = row
         if timestamp not in d:
             d[timestamp] = {}
         if node_id not in d[timestamp]:
