@@ -175,10 +175,9 @@ def get_node_metrics_date_dict(date):
     """
     d = {}
 
-    query = "SELECT timestamp, node_id, data FROM waggle.node_metrics_date WHERE date = '{}'".format(date)
-    db = get_mysql_db()
-    query_result = db.query_all(query)
-    for result in query_result:
+    statement = "SELECT timestamp, node_id, data FROM waggle.node_metrics_date WHERE date = '{}'".format(date)
+    cluster, rows = query(statement)
+    for result in rows:
         timestamp, node_id, data = result
         if timestamp not in d:
             d[timestamp] = {}
