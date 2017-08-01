@@ -203,25 +203,26 @@ class DataProcess(Process):
 
     def ExtractValuesFromMessage_node_metrics(self, props, body):
 
-        dictData = json.loads(body.decode())
+        data = body.decode().replace('\n','').replace('\\n','')
+        if self.verbosity > 1:
+            print(':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: data = ', data)
         
         # same for each parameter:value pair
         node_id         = props.reply_to
+        sampleDatetime  = datetime.datetime.utcfromtimestamp(float(props.timestamp) / 1000.0)
         sampleDate      = sampleDatetime.strftime('%Y-%m-%d')
         timestamp       = int(props.timestamp)
         
-        for k in dictData.keys():
-            parameter      = k
-            data           = str(dictData[k])
+        # date, timestamp, node_id, data
+        values = (sampleDate, timestamp, node_id, data)
 
-            values = (node_id, sampleDate, ingest_id, meta_id, timestamp, data_set, sensor, parameter, data, unit)
+        if self.verbosity > 0:
+            print('   date = ',             sampleDate  )
+            print('   timestamp = ',        timestamp   )
+            print('   node_id = ',          node_id     )
+            print('   data = ',             data    )
+        yield values
 
-            if self.verbosity > 0:
-                print('   date = ',             sampleDate  )
-                print('   timestamp = ',        timestamp   )
-                print('   node_id = ',          node_id     )
-                print('   data = ',             data        )
-            yield values
             
     def cassandra_insert(self, values):
     
@@ -303,7 +304,7 @@ class DataProcess(Process):
    
 if __name__ == '__main__':
     argParser = argparse.ArgumentParser()
-    argParser.add_argument('database', choices = ['raw', 'decoded'], 
+    argParser.add_argument('database', choices = ['raw', 'decoded', 'node-metrics'], 
         help = 'which database the data is flowing to')
     argParser.add_argument('--verbose', '-v', action='count')
     args = argParser.parse_args()
