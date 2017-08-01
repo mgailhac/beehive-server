@@ -167,7 +167,8 @@ def get_nodes_last_update_dict(dataType = None):
         result = {}
         
     return result
-    
+
+
 def get_node_metrics_date_dict(date):
     """
     Returns dictionary of node-metrics data for a given date, the result is a dictionary with the structure:

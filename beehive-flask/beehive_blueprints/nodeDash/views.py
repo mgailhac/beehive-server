@@ -1,6 +1,7 @@
 from . import nodeDash
 from flask import Flask, render_template, url_for, request, Response
 import time
+import export
 import json
 import requests
 import csv
@@ -10,21 +11,6 @@ api_url = 'http://127.0.0.1:4000'  # The url of the API for the node dashboard.
 key_list = ["id", "location", "alive", "lastupdate"]  # A list of keys of relevant incoming JSON data.
 fieldNames = ["time", "< One Minute", "< Five Minutes", "< Thirty Minutes", "< One Hour", "< Six Hours",
               "< One Day", "> One Day"]
-
-
-def apirequest(url):
-    # TODO: Add a function that changes the input data to properly formatted data.
-    """
-    This function sends a request to an api, and then converts the received data into JSON.
-    :param url: The url of the chosen api.
-    :return: The received data in JSON format.
-    """
-    req = requests.get(url)
-    json_data = req.json()
-    # return jsonformat(json_data, 1800)  # bin length is in seconds. from 1800- 100000
-
-    # print(json_data)
-    return json_data
 
 
 def jsonformat(json_data, binlength):
@@ -303,6 +289,7 @@ def serverlog():
 
 @nodeDash.route('/data.tsv')
 def data():
+    # rawdata = export.get_node_metrics_data_dict("2017-08-01")
     return open("beehive_blueprints/" + url_for('nodeDash.static', filename='temp.csv')).read()
     # return open('/usr/lib/waggle/beehive-server/beehive-flask/beehive_blueprints/nodeDash/static/temp.csv').read()
 
