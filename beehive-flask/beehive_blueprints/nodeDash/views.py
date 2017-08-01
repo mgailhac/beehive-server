@@ -22,6 +22,7 @@ def apirequest(url):
     req = requests.get(url)
     json_data = req.json()
     # return jsonformat(json_data, 1800)  # bin length is in seconds. from 1800- 100000
+
     # print(json_data)
     return json_data
 
