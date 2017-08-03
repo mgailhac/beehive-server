@@ -61,9 +61,6 @@ def apirequest(url):
         {
             "alive": 1, "id": 101100, "location": "Toronto", "lastupdate": str(time.asctime())
         },
-
-
-
         {
             'alive': 1, "location": 'Chicago', 'id': 100001, "lastupdate": str(time.asctime())
         },
