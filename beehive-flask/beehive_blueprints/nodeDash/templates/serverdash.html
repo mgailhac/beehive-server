@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="shortcut icon" href="/static/img/logo.png">
-    <link rel="stylesheet" type="text/css" href="/static/css/serverdash.css">
+    <link rel="shortcut icon" href= "{{ url_for('nodeDash.static', filename='img/logo.png') }}">
+    <link rel="stylesheet" href= "{{ url_for('nodeDash.static', filename='css/serverdash.css') }}">
     <meta charset="utf-8">
     <script src="//d3js.org/d3.v4.min.js"></script>
-    <script src="/static/js/sorttable.js"></script>
+    <script src="{{ url_for('nodeDash.static', filename='js/sorttable.js') }}"></script>
     <title>Beehive Server Dashboard</title>
 </head>
 <body>
 
-<ul style="hover{color: #F7C767}">
-    <li><a href={{ url_for("dashboard") }}>Beehive Node Dashboard</a></li>
-    <li><a href={{ url_for("server") }}>Beehive Server Dashboard</a></li>
-    <li><a href={{ url_for("documentation") }}>Documentation</a></li>
-    <li><a href='http://127.0.0.1:4000'>Beehive API</a></li>
+<ul class="navbar">
+    <li><a href= {{ url_for("nodeDash.nodeDash_root") }}>Beehive Node Dashboard</a></li>
+    <li><a href= {{ url_for("nodeDash.server") }}>Beehive Server Dashboard</a></li>
+    <li><a href= {{ url_for("nodeDash.documentation") }}>Documentation</a></li>
+    <li><a>Beehive API</a></li>
 </ul>
 
 <h1 style="border-bottom-style: solid; margin-top: 40px;">
-    <img src="/static/img/logo.png" alt="Logo" align="left">
+    <img src="{{ url_for('nodeDash.static', filename='img/logo.png') }}" alt="Logo" align="left">
     Beehive Server Dashboard</h1>
 
 <div id="date"></div>
@@ -50,15 +50,14 @@ getDate();
     </div>
 </div>
 <div id="buttonlist">
-<button style="background-color: #66bd63; cursor: pointer;" type="button" onclick="window.location= '{{url_for("dashboard")}}?cat=7'">> One Day</button>
-<button style="background-color: #a6d96a; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=6'">< One Day</button>
-<button style="background-color: #d9ef8b; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=5'">< Six Hours</button>
-<button style="background-color: #fee08b; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=4'">< One Hour</button>
-<button style="background-color: #fdae61; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=3'">< Thirty Minutes</button>
-<button style="background-color: #f46d43; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=2'">< Five Minutes</button>
-<button style="background-color: #d73027; cursor: pointer;" type="button" onclick="window.location='{{url_for("dashboard")}}?cat=1'">< One Minute</button>
+<button style="background-color: #66bd63; cursor: pointer;" type="button" onclick="window.location= '{{ url_for("nodeDash.nodeDash_root") }}?cat=7'">> One Day</button>
+<button style="background-color: #a6d96a; cursor: pointer;" type="button" onclick="window.location='{{ url_for("nodeDash.nodeDash_root") }}?cat=6'">< One Day</button>
+<button style="background-color: #d9ef8b; cursor: pointer;" type="button" onclick="window.location='{{ url_for("nodeDash.nodeDash_root") }}?cat=5'">< Six Hours</button>
+<button style="background-color: #fee08b; cursor: pointer;" type="button" onclick="window.location='{{ url_for("nodeDash.nodeDash_root") }}?cat=4'">< One Hour</button>
+<button style="background-color: #fdae61; cursor: pointer;" type="button" onclick="window.location='{{ url_for("nodeDash.nodeDash_root") }}?cat=3'">< Thirty Minutes</button>
+<button style="background-color: #f46d43; cursor: pointer;" type="button" onclick="window.location='{{ url_for("nodeDash.nodeDash_root") }}?cat=2'">< Five Minutes</button>
+<button style="background-color: #d73027; cursor: pointer;" type="button" onclick="window.location='{{ url_for("nodeDash.nodeDash_root") }}?cat=1'">< One Minute</button>
 </div>
-<script src="//d3js.org/d3.v4.min.js"></script>
 <script>
 
 var svg = d3.select("svg"),

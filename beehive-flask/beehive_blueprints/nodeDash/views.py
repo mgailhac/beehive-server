@@ -1,6 +1,7 @@
 from . import nodeDash
 from flask import Flask, render_template, url_for, request, Response
 import time
+import export
 import json
 import requests
 import csv
@@ -12,18 +13,58 @@ fieldNames = ["time", "< One Minute", "< Five Minutes", "< Thirty Minutes", "< O
               "< One Day", "> One Day"]
 
 
-def apirequest(url):
-    # TODO: Add a function that changes the input data to properly formatted data.
-    """
-    This function sends a request to an api, and then converts the received data into JSON.
-    :param url: The url of the chosen api.
-    :return: The received data in JSON format.
-    """
-    # req = requests.get(url)
-    # json_data = req.json()
-    # return jsonformat(json_data, 1800)  # bin length is in seconds. from 1800- 100000
-    # print(json_data)
-    # return json_data
+def jsonformat(json_data, binlength):
+    # TODO: document this! It's like the most important part!
+
+    # First we build the bins
+    # -----------------------
+    stamplist = []
+    timeDict = {}
+    timeMax = 0
+    timeMin = 0
+    for line in json_data:
+        timestamp = float(line)
+        if timeMax == 0:
+            timeMin = timestamp
+        if timestamp > timeMax:
+            timeMax = timestamp
+        if timestamp < timeMin:
+            timeMin = timestamp
+    duration = timeMax - timeMin
+    binNum = duration // binlength
+    binlength = duration / binNum
+    endpoint = timeMin
+    for bin in range(int(binNum)):
+        tempList = []
+        for timestamp in json_data:
+            convtimestamp = float(timestamp)
+            if endpoint <= convtimestamp < (endpoint + binlength):
+                tempList.append(json_data.get(timestamp))
+        timeDict[endpoint] = tempList
+        endpoint = endpoint + binlength
+
+    # Then we give each node just one value in each bin
+    # -------------------------------------------------
+    for bin in timeDict:
+        nodeDict = {}
+        for group in timeDict.get(bin):
+            for node in group:
+                nodeDict.get(node)
+                nodeDict[node] = {'uptime': group.get(node).get('uptime')}
+                # print(node)
+                # print(group.get(node).get('uptime'))
+        # print(nodeDict)
+        timeDict[bin] = nodeDict
+    # print(timeDict)
+    return timeDict
+
+
+@nodeDash.route('/')
+def nodeDash_root():
+    location = str(request.args.get('location'))
+    status = str(request.args.get('status'))
+    cat = str(request.args.get('cat'))
+    # table = dashtable(apirequest(api_url), location, status, cat)
     apidata = [
         {
             'alive': 1, "location": 'Chicago', 'id': 100001, "lastupdate": str(time.asctime())
@@ -134,104 +175,8 @@ def apirequest(url):
             "alive": 1, "id": 101100, "location": "Toronto", "lastupdate": str(time.asctime())
         }
     ]
-    return Response(json.dumps(apidata), mimetype='application/json')
-
-
-def jsonformat(json_data, binlength):
-    # TODO: document this! It's like the most important part!
-
-    # First we build the bins
-    # -----------------------
-    stamplist = []
-    timeDict = {}
-    timeMax = 0
-    timeMin = 0
-    for line in json_data:
-        timestamp = float(line)
-        if timeMax == 0:
-            timeMin = timestamp
-        if timestamp > timeMax:
-            timeMax = timestamp
-        if timestamp < timeMin:
-            timeMin = timestamp
-    duration = timeMax - timeMin
-    binNum = duration // binlength
-    binlength = duration / binNum
-    endpoint = timeMin
-    for bin in range(int(binNum)):
-        tempList = []
-        for timestamp in json_data:
-            convtimestamp = float(timestamp)
-            if endpoint <= convtimestamp < (endpoint + binlength):
-                tempList.append(json_data.get(timestamp))
-        timeDict[endpoint] = tempList
-        endpoint = endpoint + binlength
-
-    # Then we give each node just one value in each bin
-    # -------------------------------------------------
-    for bin in timeDict:
-        nodeDict = {}
-        for group in timeDict.get(bin):
-            for node in group:
-                nodeDict.get(node)
-                nodeDict[node] = {'uptime': group.get(node).get('uptime')}
-                # print(node)
-                # print(group.get(node).get('uptime'))
-        # print(nodeDict)
-        timeDict[bin] = nodeDict
-    # print(timeDict)
-    return timeDict
-
-
-@nodeDash.route('/')
-def nodeDash_root():
-    location = str(request.args.get('location'))
-    status = str(request.args.get('status'))
-    cat = str(request.args.get('cat'))
-    table = dashtable(apirequest(api_url), location, status, cat)
-    return render_template('dashboard.html', dashtable=table)
-
-
-def filterdata(data, location, status, cat):
-    # TODO: Make this function actually usefully filter the data in a way the user may want.
-    """
-    The purpose of this function is to filter the data being provided to the table so that only the data chosen by the
-    the user is displayed
-    :param data: raw, unfiltered JSON data used to populate the table
-    :param location: location specification
-    :param status: 1 or 0 corresponds to alive and dead.
-    :return: filtered data
-    """
-    fildata = data
-    # for row in fildata:
-    #     # TODO: For some reason, I can't filter out cat if it's equal to None.
-    #     if cat != "" and cat != "None" and cat is not None:
-    #         cat = int(cat)
-    #         print(cat)
-    #         if cat == 1:
-    #             print("cat1")
-    #         elif cat == 2:
-    #             print("cat2")
-    #         elif cat == 3:
-    #             print("cat3")
-    #         elif cat == 4:
-    #             print("cat4")
-    #         elif cat == 5:
-    #             print("cat5")
-    #         elif cat == 6:
-    #             print("cat6")
-    #         if cat == 7:
-    #             print("cat7")
-    #     if status != "" and status != "None" and status is not None:
-    #         if status == "alive":
-    #             if row.get('alive') == 1 or row.get("alive") == 1:
-    #                 print(row)
-    #                 fildata.remove(row)
-    #
-    #     if int(row.get('id')) == 1000010:
-    #
-    #         fildata.remove(row)
-    return fildata
+    datatable = dashtable(apidata, location, status, cat)
+    return render_template('dashboard.html', dashtable=datatable)
 
 
 def dashtable(data, argloc, argstat, argcat):
@@ -279,6 +224,86 @@ def dashtable(data, argloc, argstat, argcat):
     return ''.join(tbl)  # This returns a single string of HTML code, which will produce the table.
 
 
-@nodeDash.route("/test")
-def route():
-    return "route found."
+def filterdata(data, location, status, cat):
+    # TODO: Make this function actually usefully filter the data in a way the user may want.
+    """
+    The purpose of this function is to filter the data being provided to the table so that only the data chosen by the
+    the user is displayed
+    :param data: raw, unfiltered JSON data used to populate the table
+    :param location: location specification
+    :param status: 1 or 0 corresponds to alive and dead.
+    :return: filtered data
+    """
+    fildata = data
+    # for row in fildata:
+    #     # TODO: For some reason, I can't filter out cat if it's equal to None.
+    #     if cat != "" and cat != "None" and cat is not None:
+    #         cat = int(cat)
+    #         print(cat)
+    #         if cat == 1:
+    #             print("cat1")
+    #         elif cat == 2:
+    #             print("cat2")
+    #         elif cat == 3:
+    #             print("cat3")
+    #         elif cat == 4:
+    #             print("cat4")
+    #         elif cat == 5:
+    #             print("cat5")
+    #         elif cat == 6:
+    #             print("cat6")
+    #         if cat == 7:
+    #             print("cat7")
+    #     if status != "" and status != "None" and status is not None:
+    #         if status == "alive":
+    #             if row.get('alive') == 1 or row.get("alive") == 1:
+    #                 print(row)
+    #                 fildata.remove(row)
+    #
+    #     if int(row.get('id')) == 1000010:
+    #
+    #         fildata.remove(row)
+    return fildata
+
+
+@nodeDash.route('/server')
+def server():
+    global binlength
+    binlength = request.args.get('bin', 30, int)*60
+    if 1800 > binlength:
+        binlength = 1800
+    elif binlength > 86400:
+        binlength = 86400
+    # serverTable = servertable()
+    return render_template('serverdash.html', serverlog=serverlog())
+
+
+def serverlog():
+    tbl = []
+    for x in range(100, 0, -1):
+        tbl.append("<tr>")
+        tbl.append("<td> Data Received " + str(x) + "</td>")
+        tbl.append("</tr>")
+    return ''.join(tbl)
+
+
+@nodeDash.route('/data.tsv')
+def data():
+    # rawdata = export.get_node_metrics_data_dict("2017-08-01")
+    return open("beehive_blueprints/" + url_for('nodeDash.static', filename='temp.csv')).read()
+    # return open('/usr/lib/waggle/beehive-server/beehive-flask/beehive_blueprints/nodeDash/static/temp.csv').read()
+
+
+@nodeDash.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
+
+
+@nodeDash.route('/node/<nodeID>')
+def showNodePage(nodeID):
+    nodeTable = []
+    # nodeTable.append(<tr)
+    for x in range(100):
+        nodeTable.append("<tr><td>" + str(x) + "</td></tr>")
+    joinedTbl = ''.join(nodeTable)
+    return render_template('base.html', nodeTable=joinedTbl)

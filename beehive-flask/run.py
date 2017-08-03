@@ -78,6 +78,6 @@ if __name__ == "__main__":
             admin.add_view(BeehiveModelView(table, db.session))
 
     # Vamonos!
-    app.run(host = '0.0.0.0')
+    app.run(debug=True, host = '0.0.0.0')
 
 

@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
     <link rel="shortcut icon" href="/static/img/logo.png">
-    <link rel="stylesheet" type="text/css" href="/static/css/documentation.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('nodeDash.static', filename='css/documentation.css') }}"/>
     <meta charset="UTF-8">
     <title>Documentation</title>
 </head>
 <body>
 
 <ul>
-    <li><a href= {{ url_for("dashboard") }}>Beehive Node Dashboard</a></li>
-    <li><a href= {{ url_for("server") }}>Beehive Server Dashboard</a></li>
-    <li><a href= {{ url_for("documentation") }}>Documentation</a></li>
+    <li><a href= {{ url_for("nodeDash.nodeDash_root") }}>Beehive Node Dashboard</a></li>
+    <li><a href= {{ url_for("nodeDash.server") }}>Beehive Server Dashboard</a></li>
+    <li><a href= {{ url_for("nodeDash.documentation") }}>Documentation</a></li>
     <li><a href='http://127.0.0.1:4000'>Beehive API</a></li>
 </ul>
 
 <h1 style="border-bottom-style: solid; margin-top: 40px;">
-    <img src="/static/img/logo.png" alt="Logo" align="left">
+    <img src="{{ url_for('nodeDash.static', filename='img/logo.png') }}" alt="Logo" align="left">
     Documentation</h1>
 
 <h3>Node Dashboard</h3>

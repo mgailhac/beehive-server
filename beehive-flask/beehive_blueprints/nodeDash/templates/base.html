@@ -1,25 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-
-    .chart rect {
-      fill: steelblue;
-    }
-
-    .chart text {
-      fill: white;
-      font: 10px sans-serif;
-      text-anchor: middle;
-    }
-
-    </style>
-    <script src="{{ url_for('nodeDash.static', filename='js/sorttable.js') }}"></script>
     <link rel="shortcut icon" href= "{{ url_for('nodeDash.static', filename='img/logo.png') }}">
     <link rel="stylesheet" href= "{{ url_for('nodeDash.static', filename='css/dashboard.css') }}">
     <meta charset="utf-8">
     <title>Beehive Node Dashboard</title>
-
 </head>
 <body>
 <ul class="navbar">
@@ -45,11 +30,11 @@ t = setTimeout(function() {
 getDate();
 </script>
 
-<table class="sortable" style="background-color: #838E83;">
+<table>
     {% autoescape false %}
-    {{ dashtable }}
+    {{ nodeTable }}
     {% endautoescape %}
 </table>
-<p>Created By: Zachary Skluzacek <br/> Maintained By: Waggle Project</p>
+
 </body>
 </html>
