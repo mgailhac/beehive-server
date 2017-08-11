@@ -1,6 +1,7 @@
 from cassandra.cluster import Cluster
 import logging
 import os
+import re
 import sys
 import time
 
@@ -9,6 +10,12 @@ from waggle.protocol.utils.mysql import *
 sys.path.pop()
 
 logger = logging.getLogger('beehive-api')
+
+dataset_version_table = {
+    '1': 'sensor_data',
+    '2raw': 'sensor_data_raw',
+    '2': 'sensor_data_decoded',
+}
 
 
 # NOTE This is ok, but it may be nicer to move this to an application /
@@ -52,6 +59,49 @@ def get_mysql_db():
                  db="waggle")
 
 
+def validate_node_id(node_id):
+""" returns (True,None) if the node_id is valid, 
+    otherwise returns (False, msg) where msg is an error message
+"""
+    success = False
+    msg = None
+    
+    if node_id is not None 
+        and re.match('^[0-9a-fA-F]{16}$', node_id):
+        success = True
+    if not success:
+        msg = "ERROR: Illegal node_id.  Must be 16 hexadecimal characters."
+    return (success, msg)
+    
+def validate_version(version):
+""" returns (True,None) if the version is valid, 
+    otherwise returns (False, msg) where msg is an error message
+"""
+    success = False
+    msg = None
+    
+    if version is not None 
+        and version in versions:
+        success = True
+    if not success:
+        msg = "ERROR: Illegal version.  Must be one of {}.".format(str(versions))
+    return (success, msg)
+    
+def validate_date(theDate):
+""" returns (True,None) if theDate is a valid date, 
+    otherwise returns (False, msg) where msg is an error message
+"""
+    success = False
+    msg = None
+    
+    if theDate is not None 
+        and re.match('^[0-9]{2}-[0-9]{2}-[0-9]{4}$', theDate):
+        success = True
+    if not success:
+        msg = 'ERROR: Illegal date.  Must be in "YYYY-MM-DD" format.'
+    return (success, msg)
+    
+                 
 def export_generator(node_id, date, ttl, delimiter=';', version='1', limit = None):
     """
     Python generator to export sensor data from Cassandra
@@ -100,12 +150,6 @@ def export_generator(node_id, date, ttl, delimiter=';', version='1', limit = Non
                 # yield "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" % (node_id, date, ingest_id, meta_id, timestamp, data_set, sensor, parameter, data, unit)
                 yield delimiter.join((str(timestamp), data_set, sensor, parameter, data, unit))
 
-
-dataset_version_table = {
-    '1': 'sensor_data',
-    '2raw': 'sensor_data_raw',
-    '2': 'sensor_data_decoded',
-}
 
 
 def list_node_dates(version='1'):
