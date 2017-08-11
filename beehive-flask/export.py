@@ -60,9 +60,9 @@ def get_mysql_db():
 
 
 def validate_node_id(node_id):
-""" returns (True,None) if the node_id is valid, 
-    otherwise returns (False, msg) where msg is an error message
-"""
+    """ returns (True,None) if the node_id is valid, 
+        otherwise returns (False, msg) where msg is an error message
+    """
     success = False
     msg = None
     
@@ -74,9 +74,9 @@ def validate_node_id(node_id):
     return (success, msg)
     
 def validate_version(version):
-""" returns (True,None) if the version is valid, 
-    otherwise returns (False, msg) where msg is an error message
-"""
+    """ returns (True,None) if the version is valid, 
+        otherwise returns (False, msg) where msg is an error message
+    """
     success = False
     msg = None
     
@@ -88,9 +88,9 @@ def validate_version(version):
     return (success, msg)
     
 def validate_date(theDate):
-""" returns (True,None) if theDate is a valid date, 
-    otherwise returns (False, msg) where msg is an error message
-"""
+    """ returns (True,None) if theDate is a valid date, 
+        otherwise returns (False, msg) where msg is an error message
+    """
     success = False
     msg = None
     
