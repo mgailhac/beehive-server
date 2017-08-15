@@ -87,6 +87,33 @@ def pretty_print_last_update(dtNow, timestampUpdate):
 
         last_data = '<td align="left" style="background-color:{}"><b>{}</b> <tt>({})</tt></td>'.format(color, sHuman, s)
     return last_data
+    
+def pretty_print_last_update_dict(dtNow, timestampUpdate):
+    d = {'human': '', 'timestamp':''}
+    if timestampUpdate:
+        dt = datetime.datetime.utcfromtimestamp(float(timestampUpdate) / 1000.0)
+        d['timestamp'] = '({})'.format(dt.strftime("%Y-%m-%d %H:%M:%S"))
+        delta = dtNow - dt
+        if False: #bAllNodes:
+            color = timeToColors[-1][1] # negative time - should correspond to last value
+            for tuple in timeToColors:
+                if delta > tuple[0]:
+                    color = tuple[1]
+                    break
+        else:
+            color = '#ffffff'
+                
+        # human readable duration
+        sHuman = '1 m'
+        delta_seconds = delta.total_seconds()
+
+        for dur in durations_human_readable:
+            if delta_seconds >= dur[1]:
+                num = int(delta_seconds / dur[1])
+                sHuman = '{} {}'.format(num, dur[0])
+                break
+        d['human'] = sHuman
+    return d
 
 @web.route("/")
 def main_page():
@@ -168,14 +195,12 @@ def main_page():
     for node_tuple in nodes_sorted:
         node_id, name, description, location, opmode = node_tuple
         
-        last_data = pretty_print_last_update(dtUtcNow, dictLastUpdate['data'].get(node_id))
+        last_data = pretty_print_last_update_dict(dtUtcNow, dictLastUpdate['data'].get(node_id))
         if bAllNodes:
-            last_ssh  = pretty_print_last_update(dtUtcNow, dictLastUpdate['ssh'].get(node_id))
-            last_log  = pretty_print_last_update(dtUtcNow, dictLastUpdate['log'].get(node_id))
-            # concatenate them into last_data so that it stores all 3
-            last_updates = last_data + last_ssh + last_log
+            last_ssh  = pretty_print_last_update_dict(dtUtcNow, dictLastUpdate['ssh'].get(node_id))
+            last_log  = pretty_print_last_update_dict(dtUtcNow, dictLastUpdate['log'].get(node_id))
         else:
-            last_updates = last_data
+            last_ssh = last_log = pretty_print_last_update_dict(dtUtcNow, None)
 
         # last connection (most recent of all 3 last_update's)
         latest = None
@@ -186,7 +211,7 @@ def main_page():
 
         if latest:
             dtLastConnection = datetime.datetime.utcfromtimestamp(float(latest)/1000.0)
-        last_connection = pretty_print_last_update(dtUtcNow, latest)
+        last_connection = pretty_print_last_update_dict(dtUtcNow, latest)
 
         # offline status 
         bOffline = False
@@ -212,179 +237,41 @@ def main_page():
                 export.set_node_offline(node_id, False)
                 
         # compute the status
-        status = '<td align="center" style="background-color:#ff00ff">UNKNOWN</td>'
+        status = {'color':'#ff00ff', 'label':'UNKNOWN'} #'<td align="center" style="background-color:#ff00ff">UNKNOWN</td>'
         if opmode.strip().lower() != 'production':
-            status = '<td align="center" style="background-color:#8888ff">{}</td>'.format(opmode.strip())  # this shouldn't print in generic user mode
+            #status = '<td align="center" style="background-color:#8888ff">{}</td>'.format(opmode.strip())  # this shouldn't print in generic user mode
+            status = {'color':'#8888ff', 'label':opmode.strip()} 
         elif bOffline:
-            status = '<td align="center" style="background-color:#aaaaaa">Offline</td>'
+            #status = '<td align="center" style="background-color:#aaaaaa">Offline</td>'
+            status = {'color':'#aaaaaa', 'label':'Offline'} 
         elif (latest and dtUtcNow - dtLastConnection < datetime.timedelta(days = 7)): 
-            status = '<td align="center" style="background-color:#00ff00">Alive</td>'
+            #status = '<td align="center" style="background-color:#00ff00">Alive</td>'
+            status = {'color':'#00ff00', 'label':'Alive'} 
         else:
-            status = '<td align="center" style="background-color:#ff0000">Dead</td>'
+            #status = '<td align="center" style="background-color:#ff0000">Dead</td>'
+            status = {'color':'#ff0000', 'label':'Dead'} 
         
-        listRows.append('''<tr>
-            <td align="right"><tt><b>%s</b></tt></td>
-            <td><a href="nodes/%s"><tt>%s</tt></a></td>
-            <td>%s</td>
-            <td>%s</td>
-            %s
-            %s
-            %s
-            </tr>'''                \
-            % (name, node_id, node_id, description, location, status, last_connection, last_updates))
+        listRows.append({'name':name, 
+            'node_id':node_id,
+            'description':description, 
+            'location':location, 
+            'status_color':status['color'], 
+            'status_label':status['label'], 
+            'last_connection_human':last_connection['human'], 
+            'last_connection_timestamp':last_connection['timestamp'], 
+            
+            'last_data_human':last_data['human'], 
+            'last_data_timestamp':last_data['timestamp'], 
+            
+            'last_ssh_human':last_ssh['human'], 
+            'last_ssh_timestamp':last_ssh['timestamp'], 
+            
+            'last_log_human':last_log['human'], 
+            'last_log_timestamp':last_log['timestamp'], 
+        })
 
     return render_template('nodes.html',
-        api_url = api_url,
-        utc_now = dtUtcNow.strftime("%Y-%m-%d %H:%M:%S"),
-        list_rows = listRows)
-
-
-@web.route("/wcc")
-def main_page2():
-
-    api_call = web_host + '/api/1/'
-
-    # if bAllNodes ('b' is for 'bool') is True, print all nodes, otherwise filter the active ones
-    bAllNodes = request.args.get('all', 'false').lower() == 'true'
-
-    dtUtcNow = datetime.datetime.utcnow()
-    deltaOfflineMin = datetime.timedelta(hours = 1) # minimum duration to keep a node offline
-
-    # request last_update info
-    lastUpdateTypes = ['data', 'log', 'ssh']
-    dictLastUpdate = {t : export.get_nodes_last_update_dict(t) for t in lastUpdateTypes}
-    dictOffline = export.get_nodes_offline_dict()
-
-    listRows = []
-
-    all_nodes = export.get_nodes(bAllNodes)
-
-    # header row
-    headings = ['Name/<br>VSN*', 'Node ID', 'Description', 'Location', 'Status', 'Last Connection', 'Last Data']
-    if bAllNodes:  headings.extend(['Last SSH', 'Last Log'])
-    listRows.append('<tr>' + ''.join(['<td align="center"><b>{}</b></td>'.format(x) for x in headings]) + '</tr>\n')
-
-    # list of tuples.  1st number is dt, 2nd is color.  Must be sorted in order of decreasing times.
-    # find the first timedelta that is smaller than the data's timestamp's
-    timeToColors = [
-        (datetime.timedelta(days = 1),  '#ff3333'),      # dead = red
-        (datetime.timedelta(hours = 2), '#ff8000'),     # dying = orange
-        (datetime.timedelta(minutes = 5), '#ffff00'),   # just starting to die = yellow
-        (datetime.timedelta(seconds = 0), '#00ff00'),   # live = green
-        (datetime.timedelta(seconds = -1), '#ff00ff'),   # future!!! (time error) = magenta
-    ]
-    # one row per node
-
-    nodes_sorted = list()
-    for node_id in all_nodes:
-
-        node_obj = all_nodes[node_id]
-        node_id = node_id.encode('ascii','replace').lower().decode()
-
-        description = ''
-        if u'description' in node_obj:
-            if node_obj[u'description']:
-                description = node_obj[u'description'].encode('ascii','replace').decode()
-        """
-        hostname = ''
-        if u'hostname' in node_obj:
-            if node_obj[u'hostname']:
-                hostname = node_obj[u'hostname'].encode('ascii','replace').decode()
-        """
-        name = ''
-        if u'name' in node_obj:
-            if node_obj[u'name']:
-                name = node_obj[u'name'].encode('ascii','replace').decode()
-
-        location = ''
-        if u'location' in node_obj:
-            if node_obj[u'location']:
-                location = node_obj[u'location'].encode('ascii','replace').decode()
-
-        opmode = ''
-        if u'opmode' in node_obj:
-            if node_obj[u'opmode']:
-                opmode = node_obj[u'opmode'].encode('ascii','replace').decode()
-
-        nodes_sorted.append((node_id, name, description, location, opmode))
-
-    # sort the list
-    def EmptyStringsLast(v):
-        return v if v != '' else 'ZZZZZZ'
-    def MyKey(x):
-        return (EmptyStringsLast(x[1]), EmptyStringsLast(x[2]), EmptyStringsLast(x[3]), EmptyStringsLast(x[0]))
-
-    nodes_sorted.sort(key = lambda x: MyKey(x))
-
-    for node_tuple in nodes_sorted:
-        node_id, name, description, location, opmode = node_tuple
-        
-        last_data = pretty_print_last_update(dtUtcNow, dictLastUpdate['data'].get(node_id))
-        if bAllNodes:
-            last_ssh  = pretty_print_last_update(dtUtcNow, dictLastUpdate['ssh'].get(node_id))
-            last_log  = pretty_print_last_update(dtUtcNow, dictLastUpdate['log'].get(node_id))
-            # concatenate them into last_data so that it stores all 3
-            last_updates = last_data + last_ssh + last_log
-        else:
-            last_updates = last_data
-
-        # last connection (most recent of all 3 last_update's)
-        latest = None
-        for t in lastUpdateTypes:
-            if node_id in dictLastUpdate[t]:
-                if latest == None or dictLastUpdate[t][node_id] > latest:
-                    latest = dictLastUpdate[t][node_id]
-
-        if latest:
-            dtLastConnection = datetime.datetime.utcfromtimestamp(float(latest)/1000.0)
-        last_connection = pretty_print_last_update(dtUtcNow, latest)
-
-        # offline status 
-        bOffline = False
-        if node_id in dictOffline:
-            dtOfflineStart = datetime.datetime.utcfromtimestamp(float(dictOffline[node_id]))
-            dtOfflineEnd = dtOfflineStart + deltaOfflineMin
-            print('node_id = {}, dtOfflineStart = {}, dtOfflineEnd = {} dtUtcNow = {}'.format(node_id, dtOfflineStart.strftime("%Y-%m-%d %H:%M:%S"), dtOfflineEnd.strftime("%Y-%m-%d %H:%M:%S"), dtUtcNow.strftime("%Y-%m-%d %H:%M:%S")))
-            if dtUtcNow < dtOfflineEnd:
-                # offline period has not expired yet
-                bOffline = True
-            elif latest == None:
-                # no communication happened yet
-                bOffline = True
-            elif dtLastConnection < dtOfflineEnd:
-                # the last communication was before the expiration period
-                bOffline = True
-            else:   # the last communication happened after the expiration period
-                bOffline = False
-                
-            # clear the offline flag if it changed to False
-            if not bOffline:
-                print('############# CLEARING OFFLINE!!!!!!!!!!!!!!!!!!!!')
-                export.set_node_offline(node_id, False)
-                
-        # compute the status
-        status = '<td align="center" style="background-color:#ff00ff">UNKNOWN</td>'
-        if opmode.strip().lower() != 'production':
-            status = '<td align="center" style="background-color:#8888ff">{}</td>'.format(opmode.strip())  # this shouldn't print in generic user mode
-        elif bOffline:
-            status = '<td align="center" style="background-color:#aaaaaa">Offline</td>'
-        elif (latest and dtUtcNow - dtLastConnection < datetime.timedelta(days = 7)): 
-            status = '<td align="center" style="background-color:#00ff00">Alive</td>'
-        else:
-            status = '<td align="center" style="background-color:#ff0000">Dead</td>'
-        
-        listRows.append('''<tr>
-            <td align="right"><tt><b>%s</b></tt></td>
-            <td><a href="nodes/%s"><tt>%s</tt></a></td>
-            <td>%s</td>
-            <td>%s</td>
-            %s
-            %s
-            %s
-            </tr>'''                \
-            % (name, node_id, node_id, description, location, status, last_connection, last_updates))
-
-    return render_template('nodes2.html',
+        show_all_nodes = bAllNodes,
         api_url = api_url,
         utc_now = dtUtcNow.strftime("%Y-%m-%d %H:%M:%S"),
         list_rows = listRows)
